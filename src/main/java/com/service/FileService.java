@@ -1,5 +1,6 @@
 package com.service;
 
+import com.Constants;
 import com.controller.FileController;
 import com.model.RncModification;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -9,46 +10,80 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+
+import static com.Constants.RAW_RNC_CREATION_COMMANDS;
 
 @Service
 public class FileService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FileController.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileService.class);
 
   private FileStorageService fileStorageService;
   private FileParsingService parseCsvFileService;
   private CreationCommandsOperationService creationCommandsOperationService;
 
-  public FileService(FileStorageService fileStorageService, FileParsingService parseCsvFileService, CreationCommandsOperationService creationCommandsOperationService) {
+  private SshService sshService;
+  private FtpService ftpService;
+
+  public FileService(FileStorageService fileStorageService, FileParsingService parseCsvFileService,
+                     CreationCommandsOperationService creationCommandsOperationService,
+                     SshService sshService, FtpService ftpService) {
     this.fileStorageService = fileStorageService;
     this.parseCsvFileService = parseCsvFileService;
     this.creationCommandsOperationService = creationCommandsOperationService;
+    this.sshService = sshService;
+    this.ftpService = ftpService;
   }
 
-  public Resource getFileFromRemote() throws Exception {
+  public Resource getFileFromRemote() {
 
     String pathToCreationCommands = "filesOfChanges/fileOfChanges.csv";
+    String pathToCreationCommandsFile1 = "rawRncCreationCommands/file.mos";
+    String pathToCreationCommandsFile2 = "rawRncCreationCommands/file-del.mos";
     long start = System.nanoTime();
 
     final List<RncModification> filesChanges = parseCsvFileService.getAllFileChanges(pathToCreationCommands);
 
-    FileUtils.cleanDirectory(new File(pathToCreationCommands));
+    LOG.info("in getFileFromRemote");
 
-    final List<String> strings = SshService.createFilesInRemote(filesChanges);
+    LOG.info("is directory in path - {} - {}", RAW_RNC_CREATION_COMMANDS, new File(RAW_RNC_CREATION_COMMANDS).isDirectory());
 
-    FtpService.connectViaFtp(strings.get(0), pathToCreationCommands);
-    FtpService.connectViaFtp(strings.get(1), pathToCreationCommands);
+    if (new File(RAW_RNC_CREATION_COMMANDS).isDirectory()) {
+      try {
+        FileUtils.cleanDirectory(new File(RAW_RNC_CREATION_COMMANDS));
 
-    long end = System.nanoTime();
+      } catch (IOException e) {
+        LOG.error("can not find directory ", e);
+      }
 
-    creationCommandsOperationService.execute(pathToCreationCommands);
+      final List<String> strings = sshService.createFilesInRemote(filesChanges);
 
-    LOG.debug("time of execution = " + (end-start) + " nanoseconds");
+      LOG.info("after creating files through ssh - {}", strings);
 
-    Resource resource = fileStorageService.loadUpdatedFilesAsResource();
+      ftpService.connectViaFtp(strings.get(0), pathToCreationCommandsFile1);
+      ftpService.connectViaFtp(strings.get(1), pathToCreationCommandsFile2);
 
-    return resource;
+      try {
+        org.apache.commons.io.FileUtils.copyDirectoryToDirectory(new File(RAW_RNC_CREATION_COMMANDS), new File(Constants.PREPARED_CREATION_COMMANDS));
+      } catch (IOException e) {
+        LOG.error("copy files - {} {}, in directory is failed", pathToCreationCommandsFile1, pathToCreationCommandsFile2);
+      }
+
+      long end = System.nanoTime();
+
+      creationCommandsOperationService.execute(pathToCreationCommands);
+
+      LOG.debug("time of execution = " + (end - start) + " nanoseconds");
+      return fileStorageService.loadUpdatedFilesAsResource();
+    }
+
+    // TODO throw exception or status code 5** that means directory not found
+    return null;
   }
 
 }

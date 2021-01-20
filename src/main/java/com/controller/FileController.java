@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/rnc")
 public class FileController {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FileController.class);
+  private final Logger LOG = LoggerFactory.getLogger(FileController.class);
   private static String lastFileName;
 
   private FileStorageService fileStorageService;
@@ -88,6 +88,8 @@ public class FileController {
       contentType = "application/octet-stream";
     }
 
+    LOG.info("i am logger, log of application");
+
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(contentType))
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
@@ -117,9 +119,10 @@ public class FileController {
   }
 
   @GetMapping(value = "/download/files", produces="application/zip")
-  public ResponseEntity<Resource> downloadResultFiles(HttpServletRequest request) throws Exception {
+  public ResponseEntity<Resource> downloadPreparedCreationCommandsFiles(HttpServletRequest request) throws Exception {
 
     final Resource resource = fileService.getFileFromRemote();
+    LOG.info("from method downloadResultFiles");
 
     String contentType = null;
     try {

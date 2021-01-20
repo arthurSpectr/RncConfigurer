@@ -11,6 +11,7 @@ import org.springframework.web.context.request.WebRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+/*
 @RestController
 public class CustomErrorController implements ErrorController {
 
@@ -40,3 +41,4 @@ public class CustomErrorController implements ErrorController {
     return errorAttributes.getErrorAttributes(webRequest, includeStackTrace);
   }
 }
+*/

@@ -5,11 +5,13 @@ import com.model.RncModification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Service
 public class SshService {
 
   @Value("${user}")
@@ -24,116 +26,139 @@ public class SshService {
   @Value("${port}")
   static int port = 22;
 
-  private static final Logger LOG = LogManager.getLogger(CreationCommandsOperationService.class);
+  private static final Logger LOG = LogManager.getLogger(SshService.class);
 
-  public static void main(String[] args) throws Exception {
-    long start = System.nanoTime();
+//  public static void main(String[] args) throws Exception {
+//    long start = System.nanoTime();
+//
+//    FileParsingService parseCsvFileService = new FileParsingService();
+//    String pathToCreationCommands = "filesOfChanges/fileOfChanges.csv";
+//    createFilesInRemote(parseCsvFileService.getAllFileChanges(pathToCreationCommands));
+//
+//    long end = System.nanoTime();
+//
+//    LOG.debug("time of execution = " + (end - start) + " nanoseconds");
+//  }
 
-    FileParsingService parseCsvFileService = new FileParsingService();
-    String pathToCreationCommands = "filesOfChanges/fileOfChanges.csv";
-    createFilesInRemote(parseCsvFileService.getAllFileChanges(pathToCreationCommands));
-
-    long end = System.nanoTime();
-
-    LOG.debug("time of execution = " + (end - start) + " nanoseconds");
-  }
-
-  public static List<String> createFilesInRemote(List<RncModification> rncNames) throws Exception {
+  public List<String> createFilesInRemote(List<RncModification> rncNames) {
     List<String> files = new ArrayList<>();
 
-    JSch jsch = new JSch();     //CHAN
-    Session session = jsch.getSession(user, host, port);
-    session.setPassword(password);
+    Session session = null;
+    Channel channel = null;
+    OutputStream ops = null;
+    PrintStream ps = null;
 
-    session.setConfig("StrictHostKeyChecking", "no");
+    try {
+      JSch jsch = new JSch();     //CHAN
+      session = jsch.getSession(user, host, port);
+      session.setPassword(password);
 
-    session.connect();
+      session.setConfig("StrictHostKeyChecking", "no");
 
-    Channel channel = session.openChannel("shell");
+      session.connect();
 
-    OutputStream ops = channel.getOutputStream();
+      channel = session.openChannel("shell");
 
-    String utf8 = StandardCharsets.UTF_8.name();
+      ops = channel.getOutputStream();
 
-    PrintStream ps = new PrintStream(ops, true, utf8);
+      String utf8 = StandardCharsets.UTF_8.name();
 
-    channel.connect();
-    InputStream input = channel.getInputStream();
+      ps = new PrintStream(ops, true, utf8);
 
-    for (RncModification rncModification : rncNames) {
-      //commands
-      ps.println("amos " + rncModification.getModifications().get(0).getBSC());
-      LOG.info("amos " + rncModification.getModifications().get(0).getBSC());
+      channel.connect();
+      InputStream input = channel.getInputStream();
 
-      printResult(input, rncModification.getModifications().get(0).getBSC());
+      for (RncModification rncModification : rncNames) {
+        //commands
+        ps.println("amos " + rncModification.getModifications().get(0).getBSC());
+        LOG.info("amos " + rncModification.getModifications().get(0).getBSC());
 
-      ps.println("LT ALL");
-      LOG.info("LT ALL");
+        printResult(input, rncModification.getModifications().get(0).getBSC());
 
-      printResult(input, "Total:");
+        ps.println("LT ALL");
+        LOG.info("LT ALL");
 
-      ps.println("us+");
-      LOG.info("us+");
+        printResult(input, "Total:");
 
-      printResult(input, "Starting the simulated undo mode");
+        ps.println("us+");
+        LOG.info("us+");
 
-      ps.println("us?");
-      LOG.info("us?");
+        printResult(input, "Starting the simulated undo mode");
 
-      printResult(input, "Simulated Undo Mode is active");
+        ps.println("us?");
+        LOG.info("us?");
 
-      agreeWithConditions(ps, channel.getInputStream(), new StringBuilder("rdel iublink=" + rncModification.getModifications().get(0).getSite()));
+        printResult(input, "Simulated Undo Mode is active");
 
-      ps.println("us-");
-      LOG.info("us-");
+        agreeWithConditions(ps, input, new StringBuilder("rdel iublink=" + rncModification.getModifications().get(0).getSite()));
 
-      final List<String> strings = printResult(channel.getInputStream(), "To undo, execute command: run /ericsson/log/amos/moshell_logfiles/dpleskac/logs_moshell/undo/");
+        ps.println("us-");
+        LOG.info("us-");
 
-      if (!strings.isEmpty()) {
-        final String pathToFile = extractPathToFiles(strings.get(0).split("\\s"));
-        System.out.println(pathToFile);
-        files.add(pathToFile);
+        final List<String> strings = printResult(input, "To undo, execute command: run /ericsson/log/amos/moshell_logfiles/dpleskac/logs_moshell/undo/");
+
+        if (!strings.isEmpty()) {
+          final String pathToFile = extractPathToFiles(strings.get(0).split("\\s"));
+          System.out.println(pathToFile);
+          files.add(pathToFile);
+        }
+
+        ps.println("us+");
+        LOG.info("us+");
+
+        printResult(input, "Starting the simulated undo mode", 3000);
+
+        ps.println("us?");
+        LOG.info("us?");
+
+        printResult(input, "Simulated Undo Mode is active");
+
+        agreeWithConditions(ps, input, new StringBuilder("rdel ExternalEutranCell=" + rncModification.getModifications().get(0).getSite()));
+
+        ps.println("us-");
+        LOG.info("us-");
+
+        final List<String> pathToFile = printResult(input, "To undo, execute command: run /ericsson/log/amos/moshell_logfiles/dpleskac/logs_moshell/undo/");
+
+        if (!pathToFile.isEmpty()) {
+          final String file = extractPathToFiles(pathToFile.get(0).split("\\s"));
+          System.out.println(file);
+          files.add(file);
+        }
       }
 
-      ps.println("us+");
-      LOG.info("us+");
+    } catch (JSchException e) {
+      LOG.error("can't connect via ssh  ", e);
+    } catch (IOException e) {
+      LOG.error("can't get output from rnc host  ", e);
+    } catch (InterruptedException e) {
+      LOG.error("can't read or perform commands in rnc host ", e);
+    } finally {
 
-      printResult(input, "Starting the simulated undo mode", 3000);
-
-      ps.println("us?");
-      LOG.info("us?");
-
-      printResult(input, "Simulated Undo Mode is active");
-
-      agreeWithConditions(ps, channel.getInputStream(), new StringBuilder("rdel ExternalEutranCell=" + rncModification.getModifications().get(0).getSite()));
-
-      ps.println("us-");
-      LOG.info("us-");
-
-      final List<String> pathToFile = printResult(channel.getInputStream(), "To undo, execute command: run /ericsson/log/amos/moshell_logfiles/dpleskac/logs_moshell/undo/");
-
-      if (!pathToFile.isEmpty()) {
-        final String file = extractPathToFiles(pathToFile.get(0).split("\\s"));
-        System.out.println(file);
-        files.add(file);
+      try {
+        if(ops != null) {
+          ops.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
       }
+
+      if(ps != null) ps.close();
+      if(channel != null) channel.disconnect();
+      if(session != null) session.disconnect();
+
     }
 
-
-    ps.close();
-
-    channel.disconnect();
-    session.disconnect();
 
     return files;
   }
 
   static List<String> printResult(InputStream input, String comparingString) throws IOException, InterruptedException {
-    Thread.sleep(1000);
+    Thread.sleep(2000);
     List<String> commands = new ArrayList<>();
 
     while (input.available() > 0) {
-      Thread.sleep(150);
+      Thread.sleep(300);
       byte[] bytes = new byte[1024];
       int i = input.read(bytes, 0, 1024);
       if (i < 0) break;
@@ -175,13 +200,21 @@ public class SshService {
 
   static void agreeWithConditions(PrintStream printStream, InputStream inputStream, StringBuilder sb) throws IOException, InterruptedException {
     String checkPhrase = "Are you Sure [y/n]";
+    String previousCheckPhrase = "Are you Sure [y/n] ? y";
 
     for (; ; ) {
       printStream.println(sb.toString());
 
       final List<String> strings = SshService.printResult(inputStream, checkPhrase);
 
-      final long count = strings.stream().filter(e -> e.contains(checkPhrase)).count();
+      List<String> stringSubList;
+      long count = 0;
+      if(strings.size() > 1) {
+        stringSubList = new ArrayList<>(strings.subList(1, strings.size()));
+        count = stringSubList.stream().filter(e -> e.contains(checkPhrase)).filter(e -> !e.contains(previousCheckPhrase)).count();
+      } else {
+        count = strings.stream().filter(e -> e.contains(checkPhrase)).count();
+      }
 
       if (count == 0) {
         return;
@@ -189,7 +222,8 @@ public class SshService {
 
       boolean contains = false;
 
-      for (int i = 1; i < 3; i++) {
+      for (int i = 1; i <= strings.size(); i++) {
+
         contains = strings.get(strings.size() - i).contains(checkPhrase);
         if (contains) break;
       }

@@ -29,16 +29,25 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class FileStorageService {
 
-  private static final Logger LOG = LogManager.getLogger(FileParsingService.class);
+  private static final Logger LOG = LogManager.getLogger(FileStorageService.class);
 
   private final Path fileStorageLocation;
   private final Path oldFilesDirectory;
+  private final Path rncCreationCommands;
+  private final Path afterModification;
+  private final Path preparedCreationCommands;
 
   public FileStorageService() {
 
     this.fileStorageLocation = Paths.get("filesOfChanges/")
         .toAbsolutePath().normalize();
     this.oldFilesDirectory = Paths.get("oldFiles/")
+            .toAbsolutePath().normalize();
+    this.rncCreationCommands = Paths.get("rawRncCreationCommands/")
+            .toAbsolutePath().normalize();
+    this.afterModification = Paths.get("afterModification/")
+            .toAbsolutePath().normalize();
+    this.preparedCreationCommands = Paths.get("preparedCreationCommands/")
             .toAbsolutePath().normalize();
 
     try {
@@ -48,6 +57,18 @@ public class FileStorageService {
 
       if(!Files.exists(oldFilesDirectory)) {
         Files.createDirectories(this.oldFilesDirectory);
+      }
+
+      if(!Files.exists(rncCreationCommands)) {
+        Files.createDirectories(this.rncCreationCommands);
+      }
+
+      if(!Files.exists(afterModification)) {
+        Files.createDirectories(this.afterModification);
+      }
+
+      if(!Files.exists(preparedCreationCommands)) {
+        Files.createDirectories(this.preparedCreationCommands);
       }
     } catch (Exception ex) {
       throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
@@ -140,39 +161,78 @@ public class FileStorageService {
     try (FileOutputStream fos = new FileOutputStream(directoryToArchive + "/" + zipName);
          ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
-      List<String> srcFiles = new ArrayList<>();
-
-      File folder = new File(directoryToArchive);
-      File[] listOfFiles = folder.listFiles();
-
-      if (null != listOfFiles) {
-        for (File listOfFile : listOfFiles) {
-          if (listOfFile.isFile()) {
-            srcFiles.add(directoryToArchive + "/" + listOfFile.getName());
-          }
-        }
-      }
-
-      for (String srcFile : srcFiles) {
-        File fileToZip = new File(srcFile);
-        FileInputStream fis = new FileInputStream(fileToZip);
-        ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
-        zipOut.putNextEntry(zipEntry);
-
-        byte[] bytes = new byte[1024];
-        int length;
-        while ((length = fis.read(bytes)) >= 0) {
-          zipOut.write(bytes, 0, length);
-        }
-        fis.close();
-      }
+      zipFile(new File(directoryToArchive), directoryToArchive, zipOut);
 
     } catch (IOException e) {
-      LOG.error("problem with file ", e);
+      e.printStackTrace();
     }
+//    try (FileOutputStream fos = new FileOutputStream(directoryToArchive + "/" + zipName);
+//         ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+//
+//      List<String> srcFiles = new ArrayList<>();
+//
+//      File folder = new File(directoryToArchive);
+//      File[] listOfFiles = folder.listFiles();
+//
+//      if (null != listOfFiles) {
+//        for (File listOfFile : listOfFiles) {
+//          if (listOfFile.isFile() && !listOfFile.getName().contains("zip")) {
+//            srcFiles.add(directoryToArchive + "/" + listOfFile.getName());
+//          }
+//        }
+//      }
+//
+//      for (String srcFile : srcFiles) {
+//        File fileToZip = new File(srcFile);
+//        FileInputStream fis = new FileInputStream(fileToZip);
+//        ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+//        zipOut.putNextEntry(zipEntry);
+//
+//        byte[] bytes = new byte[1024];
+//        int length;
+//        while ((length = fis.read(bytes)) >= 0) {
+//          zipOut.write(bytes, 0, length);
+//        }
+//        fis.close();
+//      }
+//
+//    } catch (IOException e) {
+//      LOG.error("problem with file ", e);
+//    }
 
     return zipName;
   }
+
+  private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+    if (fileToZip.isHidden()) {
+      return;
+    }
+    if (fileToZip.isDirectory()) {
+      if (fileName.endsWith("/")) {
+        zipOut.putNextEntry(new ZipEntry(fileName));
+        zipOut.closeEntry();
+      } else {
+        zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+        zipOut.closeEntry();
+      }
+      File[] children = fileToZip.listFiles();
+      for (File childFile : children) {
+        zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+      }
+      return;
+    }
+    if(fileName.contains(".zip")) return;
+    FileInputStream fis = new FileInputStream(fileToZip);
+    ZipEntry zipEntry = new ZipEntry(fileName);
+    zipOut.putNextEntry(zipEntry);
+    byte[] bytes = new byte[1024];
+    int length;
+    while ((length = fis.read(bytes)) >= 0) {
+      zipOut.write(bytes, 0, length);
+    }
+    fis.close();
+  }
+
 
   public Resource loadFilesAsResource() {
 
@@ -194,8 +254,8 @@ public class FileStorageService {
 
   public Resource loadUpdatedFilesAsResource() {
 
-    final String zipArchive = zipArchive("afterModification.zip", "afterModification");
-    String archivedDirectory = "afterModification";
+    final String zipArchive = zipArchive("preparedCreationCommands.zip", "preparedCreationCommands");
+    String archivedDirectory = "preparedCreationCommands";
 
     try {
       Path filePath = Paths.get(archivedDirectory + "/").resolve(zipArchive).normalize();

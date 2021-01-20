@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.Logger;
 
-import static com.model.Constants.*;
+import static com.Constants.*;
 
 @Service
 public class CreationCommandsOperationService {
@@ -36,39 +36,39 @@ public class CreationCommandsOperationService {
   private String pathToSite;
 
 
-  public static void main(String[] args) throws IOException {
-    long start = System.nanoTime();
+//  public static void main(String[] args) throws IOException {
+//    long start = System.nanoTime();
+//
+//    methodForTest();
+//
+//    long end = System.nanoTime();
+//
+//    LOG.debug("time of execution = " + (end-start) + " nanoseconds");
+//  }
 
-    execute1();
-
-    long end = System.nanoTime();
-
-    LOG.debug("time of execution = " + (end-start) + " nanoseconds");
-  }
-
-  public static void execute1() {
-
-    Map<String, List<String>> creationCommandsFiles = ModelUtils.getCreationCommandsFiles();
-
-    CreationCommandsOperationService parser = new CreationCommandsOperationService();
-
-    List<RncModification> modifications = extractAllRehomeInformation(TEST_FILE_OF_CHANGES4);
-
-    for (RncModification changeCommand : modifications) {
-      String site = changeCommand.getModifications().get(0).getSite();
-      parser.setPathToSite(RESULT_FILES + site + "/");
-      parser.setSite(site + "/");
-      List<String> fileNames = creationCommandsFiles.get(site);
-
-      List<CreationCommand> updatedCreationCommands = parser.performModification(changeCommand, fileNames, TEST_FILE_OF_RESULT);
-
-      parser.placeCommandsBySeparatedFiles(updatedCreationCommands);
-      parser.createLacRacUra(changeCommand);
-      parser.write2GNeighbors();
-      parser.write3GNeighbors();
-    }
-
-  }
+//  public static void methodForTest() {
+//
+//    Map<String, List<String>> creationCommandsFiles = ModelUtils.getCreationCommandsFiles();
+//
+//    CreationCommandsOperationService parser = new CreationCommandsOperationService();
+//
+//    List<RncModification> modifications = extractAllRehomeInformation(TEST_FILE_OF_CHANGES4);
+//
+//    for (RncModification changeCommand : modifications) {
+//      String site = changeCommand.getModifications().get(0).getSite();
+//      parser.setPathToSite(PREPARED_CREATION_COMMANDS + site + "/");
+//      parser.setSite(site + "/");
+//      List<String> fileNames = creationCommandsFiles.get(site);
+//
+//      List<CreationCommand> updatedCreationCommands = parser.performModification(changeCommand, fileNames, TEST_FILE_OF_RESULT);
+//
+//      parser.placeCommandsBySeparatedFiles(updatedCreationCommands);
+//      parser.createLacRacUra(changeCommand);
+//      parser.write2GNeighbors();
+//      parser.write3GNeighbors();
+//    }
+//
+//  }
 
 
   public void execute(String fileOfChanges) {
@@ -81,11 +81,11 @@ public class CreationCommandsOperationService {
 
     for (RncModification changeCommand : modifications) {
       String site = changeCommand.getModifications().get(0).getSite();
-      parser.setPathToSite(RESULT_FILES + site + "/");
+      parser.setPathToSite(PREPARED_CREATION_COMMANDS + site + "/");
       parser.setSite(site + "/");
       List<String> fileNames = creationCommandsFiles.get(site);
 
-      List<CreationCommand> updatedCreationCommands = parser.performModification(changeCommand, fileNames, "afterModification/updated.mos");
+      List<CreationCommand> updatedCreationCommands = parser.performModification(changeCommand, fileNames, PREPARED_CREATION_COMMANDS + "/updated.mos");
 
       parser.placeCommandsBySeparatedFiles(updatedCreationCommands);
       parser.createLacRacUra(changeCommand);
@@ -228,8 +228,8 @@ public class CreationCommandsOperationService {
         new File(pathToSite).mkdirs();
       }
 
-      if(!new File(CREATION_COMMANDS_DIRECTORY).exists()) {
-        new File(CREATION_COMMANDS_DIRECTORY).mkdir();
+      if(!new File(RAW_RNC_CREATION_COMMANDS).exists()) {
+        new File(RAW_RNC_CREATION_COMMANDS).mkdir();
       }
 
       if(!new File(FILES_OF_CHANGES_DIRECTORY).exists()) {
@@ -346,7 +346,7 @@ public class CreationCommandsOperationService {
     for (String fileOfCreationCommand : fileOfCreationCommands) {
 
       try {
-        String[] split = Files.readAllLines(new File(CREATION_COMMANDS_DIRECTORY + fileOfCreationCommand).toPath()).stream()
+        String[] split = Files.readAllLines(new File(RAW_RNC_CREATION_COMMANDS + fileOfCreationCommand).toPath()).stream()
                 .filter(e -> !e.contains("gs+") && !e.contains("gs-"))
                 .map(e -> e.isEmpty() ? "&" : e + "\n")
                 .collect(Collectors.joining())
@@ -522,7 +522,8 @@ public class CreationCommandsOperationService {
 
     try {
       new File(fileOfResult).delete();
-      new File(fileOfResult).createNewFile();
+      boolean isFileCreated = new File(fileOfResult).createNewFile();
+      LOG.info("is file in afterModification created - {}", isFileCreated);
     } catch (IOException e) {
       LOG.error("file not found or can not acces to file");
     }

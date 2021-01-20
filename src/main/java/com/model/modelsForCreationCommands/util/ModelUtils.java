@@ -1,6 +1,6 @@
 package com.model.modelsForCreationCommands.util;
 
-import com.model.Constants;
+import com.Constants;
 import com.model.Patterns;
 
 import java.io.File;
@@ -84,6 +84,8 @@ public class ModelUtils {
     }
 
     String name = "";
+
+    if(split.length <= 1) throw new RuntimeException("file downloaded from rnc - " + fileName + ", is empty");
     if(split[2].contains("eNodeBId")) {
       name = split[2].split("[=,_]")[7].split("[\nL]")[0];
     } else {
@@ -96,14 +98,14 @@ public class ModelUtils {
 
     Map<String, List<String>> nameAndFiles = new TreeMap<>();
 
-    File creationCommandsDir = new File(Constants.CREATION_COMMANDS_DIRECTORY);
+    File creationCommandsDir = new File(Constants.RAW_RNC_CREATION_COMMANDS);
 
     if(creationCommandsDir.exists() && creationCommandsDir.list() != null && creationCommandsDir.list().length != 0) {
 
       String[] list = creationCommandsDir.list();
 
       for (String s : list) {
-        String s1 = extractSiteName(Constants.CREATION_COMMANDS_DIRECTORY + s);
+        String s1 = extractSiteName(Constants.RAW_RNC_CREATION_COMMANDS + s);
 
         if(nameAndFiles.containsKey(s1)) {
           nameAndFiles.get(s1).add(s);
