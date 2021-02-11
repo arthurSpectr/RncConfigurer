@@ -1,0 +1,27 @@
+
+
+<div class="container">
+
+  <div class="grid">
+    <div class="grid__header">
+      <div class="grid__header__item" *ngFor="let header of headers">{{header}}</div>
+      <!--      <div class="grid__header__item">{{dataSource[0] |}}</div>-->
+    </div>
+    <div class="grid__body">
+      <div class="grid__body__line" *ngFor="let line of values">
+<!--        <div class="grid__body__line__elem">{{line[++i]}}</div>-->
+        <div class="grid__body__line__elem" *ngFor="let item of line">
+<!--          <input type="text" value="{{item}}">-->
+
+          <form class="example-form">
+            <mat-form-field class="example-full-width">
+              <input matInput value="{{item}}">
+            </mat-form-field>
+          </form>
+        </div>
+      </div>
+<!--      <div class="grid__body__item" *ngFor="let item of items">{{item}}</div>-->
+    </div>
+  </div>
+
+</div>

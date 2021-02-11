@@ -1,0 +1,32 @@
+<div class="container">
+  <mat-toolbar #header>
+
+    <mat-toolbar-row>
+      <span class="floated">RE_MN App </span>
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item>
+          <mat-icon>dialpad</mat-icon>
+          <span>Redial</span>
+        </button>
+        <button mat-menu-item disabled>
+          <mat-icon>voicemail</mat-icon>
+          <span>Check voicemail</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>notifications_off</mat-icon>
+          <span>Disable alerts</span>
+        </button>
+      </mat-menu>
+      <a class="button" id="home" routerLink="table" routerLinkActive="active">
+        <button mat-raised-button color="primary">Home</button>
+      </a>
+      <!--    <button class="floated" id="login" mat-raised-button color="primary" (click)="logOut()">Login</button>-->
+      <button class="some" id="logout" mat-raised-button color="primary" (click)="logOut()">Log out</button>
+    </mat-toolbar-row>
+
+  </mat-toolbar>
+
+</div>

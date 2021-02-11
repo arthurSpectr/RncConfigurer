@@ -1,0 +1,122 @@
+.container {
+  position: relative;
+  max-height: 600px;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 500px;
+  line-height: 2;
+}
+
+.mat-card {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+
+  background-color: #f8f9fb;
+}
+
+.card__title {
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: 10px;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+mat-form-field {
+  text-align: center;
+}
+
+#central {
+  //margin-left: 2%;
+  //margin-right: auto;
+
+}
+
+mat-card-header {
+  //margin-left: -15px;
+}
+
+.mat-input-underline {
+  background-color: #FF0000;    /* replace this color with your accent color hex code */
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow:0 0 0 50px white inset; /* Change the color to your own background color */
+  -webkit-text-fill-color: #333;
+}
+
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 50px white inset;/*your box-shadow*/
+  -webkit-text-fill-color: #333;
+}
+
+
+
+
+/* Login */
+//.login {
+//  width: 100%;
+//  height: 100%;
+//  margin: 0 auto;
+//}
+//
+//.container {
+//  height: 100%;
+//  max-height: 900px;
+//  text-align: center;
+//  position: relative;
+//}
+//
+//.card {
+//  position: absolute;
+//  width: 100%;
+//  max-width: 500px;
+//
+//  height: 100%;
+//  max-height: 200px;
+//
+//  top: 0;
+//  right: 0;
+//  bottom: 0;
+//  left: 0;
+//  margin: auto;
+//  overflow: auto;
+//
+//  background: whitesmoke; /* Цвет фона */
+//  box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Параметры тени */
+//  padding: 10px;
+//}
+//
+//.card__title {
+//  margin-top: 30px;
+//}
+//
+//.card__name input {
+//  line-height: 2;
+//
+//  text-align: left;
+//  width: 100%;
+//  max-width: 240px;
+//  border: none;
+//
+//  margin-top: 10px;
+//}
+//
+//.card__button {
+//  margin-top: 10px;
+//}

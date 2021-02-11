@@ -1,0 +1,59 @@
+<!--<div #scrollTo>-->
+<!--  <div [hidden]="valid"  >-->
+
+<!--    <label class="warning">inputted Rnc was not found</label>-->
+<!--    <div>-->
+<!--      <button (click)="showWarning()" mat-raised-button color="primary" id="addRnc">add rnc</button>-->
+<!--    </div>-->
+
+<!--    <mat-card class="example-card">-->
+<!--      <mat-card-header class="warning" >-->
+<!--        <mat-card-title>Warning</mat-card-title>-->
+<!--      </mat-card-header>-->
+<!--      <mat-card-content>-->
+<!--        <h3>Rnc you inputted was not found</h3>-->
+<!--      </mat-card-content>-->
+<!--      <mat-card-actions>-->
+<!--        <button mat-raised-button color="warn" (click)="openDialog()">create Rnc</button>-->
+<!--        <button mat-raised-button color="warn" (click)="openDialog()">Rnc</button>-->
+<!--      </mat-card-actions>-->
+
+<!--    </mat-card>-->
+<!--  </div>-->
+<!--</div>-->
+<mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+  <ng-container *ngFor="let header of displayedColumns" [matColumnDef]="header"  >
+    <mat-header-cell class="header" *matHeaderCellDef> {{header}} </mat-header-cell>
+    <mat-cell (change)="scroll()"
+              [ngClass]="{current: (header=='BSC' && element.BSC!=element['New BSC']) || (header=='CI' && element.CI!=element['New CI']) || (header=='LAC' && element.LAC!=element['New LAC']),
+        updated: (header=='New BSC' && element.BSC!=element['New BSC']) || (header=='New CI' && element.CI!=element['New CI']) || (header=='New LAC' && element.LAC!=element['New LAC']) }"
+              *matCellDef="let element"> {{element[header]}} </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
+
+<div class="container">
+  <form #myForm="ngForm" [formGroup]="form">
+    <mat-form-field class="example-full-width">
+      <label for="search"></label><input matInput type="text" class="form-control" formControlName="search" id="search" placeholder="input file name">
+    </mat-form-field>
+    <input type="file" name="photo" id="selectedFile" ng2FileSelect [uploader]="uploader"
+           (change)="uploader.uploadAll()" style="display: none;" />
+    <button id="import" mat-raised-button (click)="browse()">Import</button>
+    <button id="clear" mat-raised-button [disabled]="!this.isUploaded" (click)="perform()">Perform</button>
+<!--    <button id="export" mat-raised-button (click)="action()">Export to Excel</button>-->
+    <button id="create" mat-raised-button (click)="downloadFile()">Download Sample File</button>
+    <button id="result" mat-raised-button [disabled]="false" (click)="showResult()">show creation commands with changes</button>
+
+  </form>
+
+</div>
+
+<!--<div id="message-box">-->
+<!--  <p class="message">message1</p>-->
+<!--  <p class="message">message2</p>-->
+<!--</div>-->
+<!--<button id="message-button" mat-fab color="primary">Primary</button>-->
