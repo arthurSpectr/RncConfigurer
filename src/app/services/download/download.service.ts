@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
-import {map} from 'rxjs/operators';
+import {delay, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -42,8 +42,12 @@ export class DownloadService {
     return this.http.get(this.API + "get-file-of-changes/" + filename);
   }
 
-  validateRnc(): Observable<any> {
-    return this.http.get(this.API + "validate-file-of-changes");
+  reCreateFileOfChanges(): Observable<any> {
+    return this.http.get(this.API + "recreate-file-of-changes/");
+  }
+
+  validateRnc(file: any): Observable<any> {
+    return this.http.post(this.API + "validate-file-of-changes", file);
   }
 
   inputChanges(fileOfChanges: string): Promise<object> {

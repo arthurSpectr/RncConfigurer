@@ -30,7 +30,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import { StepperComponent } from './components/stepper/stepper.component';
+import { StepperComponent, DialogOverviewExampleDialog } from './components/stepper/stepper.component';
 // import { TableCloneComponent } from './components/table/table-clone/table-clone.component';
 import { GridComponent } from './components/grid/grid.component';
 import {MatGridListModule} from '@angular/material/grid-list';
@@ -49,6 +49,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     // ShowResultComponent,
     // CompareComponent,
     StepperComponent,
+    DialogOverviewExampleDialog,
     // TableCloneComponent,
     GridComponent
   ],

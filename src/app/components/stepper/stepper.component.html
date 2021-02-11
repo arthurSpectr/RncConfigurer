@@ -28,11 +28,11 @@
               </mat-form-field>
 
               <button class="controls__btns__general" mat-raised-button (click)="browse()">Import file</button>
-              <button mat-raised-button (click)="validateFile()" [disabled]="visible">Validate file</button>
+              <button mat-raised-button (click)="validateFile()" [disabled]="validateVisible">Validate file</button>
             </div>
 
             <div class="next">
-              <button id="firstStep" mat-stroked-button color="primary" matStepperNext [disabled]="visible">Next</button>
+              <button id="firstStep" mat-stroked-button color="primary" matStepperNext [disabled]="nextVisible">Next</button>
             </div>
           </div>
         </div>

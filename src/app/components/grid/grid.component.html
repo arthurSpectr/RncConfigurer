@@ -8,14 +8,18 @@
       <!--      <div class="grid__header__item">{{dataSource[0] |}}</div>-->
     </div>
     <div class="grid__body">
-      <div class="grid__body__line" *ngFor="let line of values">
+      <div class="grid__body__line" *ngFor="let line of values; trackBy:trackByFn">
 <!--        <div class="grid__body__line__elem">{{line[++i]}}</div>-->
-        <div class="grid__body__line__elem" *ngFor="let item of line">
+        <div class="grid__body__line__elem" *ngFor="let item of line; trackBy:trackByFn">
 <!--          <input type="text" value="{{item}}">-->
 
           <form class="example-form">
             <mat-form-field class="example-full-width">
-              <input matInput value="{{item}}">
+              <input matInput value="{{item}}" 
+              name="item"
+              [(ngModel)]="values[values.indexOf(line)][line.indexOf(item)]"
+              [ngStyle]="{'color': values2[values.indexOf(line)][line.indexOf(item)] ? 'black' : 'red' }"
+              >
             </mat-form-field>
           </form>
         </div>
