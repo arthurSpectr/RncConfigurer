@@ -62,23 +62,30 @@ export class StepperComponent implements OnInit {
     })
 
     // this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; this.isDivVisible = true; };
+    // this.uploader.onErrorItem = (item: any, response: any, status: any, headers: any) => {
+    //   alert(response.message);
+    // };
+
+    let dialogRef;
 
     this.uploader.onBeforeUploadItem = (file) => {
       this.lastFileName = this.filename;
       this.filename = file._file.name;
       console.log("onBeforeUploadItem", file);
+
+      dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+        width: '150px',
+        height: '150px',
+        disableClose: true
+      });
     };
     this.uploader.onAfterAddingFile = (file) => {
       file.withCredentials = false;
     };
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      console.log("onBeforeUploadItem", response);
+      console.log("onCompleteItem", response);
 
-      const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-        width: '150px',
-        height: '150px',
-        disableClose: true
-      });
+      
 
       if (JSON.parse(response).status) {
 
@@ -115,7 +122,7 @@ export class StepperComponent implements OnInit {
             return;
           }
 
-        }, err => { console.log(err) });
+        }, err => { console.log(err); dialogRef.close(); });
       } else {
         alert('validation was not passed, choose another file');
       }
@@ -156,6 +163,7 @@ export class StepperComponent implements OnInit {
   }
 
   validateFile() {
+    this.nextVisible = true;
 
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
       width: '150px',
@@ -172,18 +180,50 @@ export class StepperComponent implements OnInit {
 
 
       this.nextVisible = !this.arrayEquals(data['values'], this.values);
-      console.log("array are equal - ", !this.nextVisible);
-      
     }, error => {
       console.log(error);
     })
   }
 
-  arrayEquals(a, b): boolean {
-    return Array.isArray(a) &&
-      Array.isArray(b) &&
-      a.length === b.length &&
-      a.every((val, index) => val === b[index]);
+  // arrayEquals(a, b): boolean {
+  //   return Array.isArray(a) &&
+  //     Array.isArray(b) &&
+  //     a.length === b.length &&
+  //     a.every((val, index) => val.every((val1, index1) => val1 === b[index][index1]) );
+  // }
+
+  arrayEquals(arr1, arr2): boolean {
+		
+    let result = true;
+  
+    if(!Array.isArray(arr1) || !Array.isArray(arr2)) {
+        result = false;
+    }
+    
+    if(arr1.length !== arr2.length) {
+      result = false;
+    }
+    
+    for(var i = 0; i < arr1.length; i++) {
+      if(arr1[i].length !== arr2[i].length) {
+        result = false;
+      }
+    }
+    
+    for(var i = 0; i < arr1.length; i++) {
+    
+      for(var q = 0; q < arr1[i].length; q++) {
+        var res = arr1[i][q] === arr2[i][q];
+        
+        if(!res) {
+          result = false;
+        }
+      }
+      
+    }
+    
+    
+    return result;
   }
 
 }
