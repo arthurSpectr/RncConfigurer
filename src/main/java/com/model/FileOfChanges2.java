@@ -6,12 +6,12 @@ import java.util.List;
 public class FileOfChanges2 {
 
   private List<String> headers = new ArrayList<>();
-  private List<List<String>> values = new ArrayList<>();
+  private List<List<Object>> values = new ArrayList<>();
 
   public FileOfChanges2() {
   }
 
-  public FileOfChanges2(List<String> headers, List<List<String>> values) {
+  public FileOfChanges2(List<String> headers, List<List<Object>> values) {
     this.headers = headers;
     this.values = values;
   }
@@ -24,11 +24,13 @@ public class FileOfChanges2 {
     this.headers = headers;
   }
 
-  public List<List<String>> getValues() {
+  public List<List<Object>> getValues() {
     return values;
   }
 
-  public void setValues(List<List<String>> values) {
+  public void setValues(List<List<Object>> values) {
     this.values = values;
   }
+
+
 }

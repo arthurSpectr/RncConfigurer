@@ -88,12 +88,12 @@ public class FileStorageService {
       // Copy file to the target location (Replacing existing file with the same name)
       Path targetLocation = this.fileStorageLocation.resolve(fileName);
 
-      if (Files.exists(targetLocation)) {
-        Path targetLocationForOldFile = oldFilesDirectory.resolve(fileName);
-        Files.copy(targetLocation, targetLocationForOldFile, StandardCopyOption.REPLACE_EXISTING);
-      } else {
+//      if (Files.exists(targetLocation)) {
+//        Path targetLocationForOldFile = oldFilesDirectory.resolve(fileName);
+//        Files.copy(targetLocation, targetLocationForOldFile, StandardCopyOption.REPLACE_EXISTING);
+//      } else {
         Files.copy(in, targetLocation, StandardCopyOption.REPLACE_EXISTING);
-      }
+//      }
 
       return fileName;
     } catch (IOException ex) {
