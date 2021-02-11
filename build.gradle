@@ -41,6 +41,12 @@ dependencies {
   // this dependency must be, Otherwise, Gradle fetches an older one that doesn’t work.
   compile group: 'org.springframework', name: 'spring-tx', version: '5.2.8.RELEASE'
 
+  // for session management
+  implementation 'org.springframework.session:spring-session-data-redis'
+
+  compile group: 'redis.clients', name: 'jedis', version: '3.4.1'
+
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 // end block
 
@@ -65,13 +71,22 @@ sourceSets {
     resources {
 //      srcDirs = ["$webappDir", "$projectDir/src/main/resources"]
       exclude '**/Rnc-ui/*'
+      exclude 'Rnc-ui/*'
+      exclude '/Rnc-ui/*'
+      exclude '*/Rnc-ui/*'
+      exclude 'Rnc-ui'
     }
   }
 }
 
-//processResources {
+processResources {
 //  dependsOn "buildAngular"
-//}
+  exclude '**/Rnc-ui/*'
+  exclude 'Rnc-ui/*'
+  exclude '/Rnc-ui/*'
+  exclude '*/Rnc-ui/*'
+  exclude 'Rnc-ui'
+}
 //
 //task buildAngular(type:Exec) {
 //  dependsOn "installAngular"
