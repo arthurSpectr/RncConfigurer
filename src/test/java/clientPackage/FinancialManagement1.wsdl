@@ -1,0 +1,1037 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="astelit.ukr:fm" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="FinancialManagement" targetNamespace="astelit.ukr:fm">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://chain.api.ws.rtn.idr.astelit.ukr/" targetNamespace="http://chain.api.ws.rtn.idr.astelit.ukr/" version="1.0">
+
+  <xs:element name="executeChain" type="tns:executeChain"/>
+
+  <xs:element name="executeChainResponse" type="tns:executeChainResponse"/>
+
+  <xs:element name="executeDebugChain" type="tns:executeDebugChain"/>
+
+  <xs:element name="executeDebugChainResponse" type="tns:executeDebugChainResponse"/>
+
+  <xs:element name="getChainSignature" type="tns:getChainSignature"/>
+
+  <xs:element name="getChainSignatureResponse" type="tns:getChainSignatureResponse"/>
+
+  <xs:element name="getRegisteredChainsNames" type="tns:getRegisteredChainsNames"/>
+
+  <xs:element name="getRegisteredChainsNamesResponse" type="tns:getRegisteredChainsNamesResponse"/>
+
+  <xs:complexType name="businessError">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="errorName" type="xs:string"/>
+      <xs:element minOccurs="0" name="errorMessage" type="xs:string"/>
+      <xs:element minOccurs="0" name="errorDetails" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="logEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="context" type="xs:string"/>
+      <xs:element minOccurs="0" name="entryType" type="tns:entryType"/>
+      <xs:element minOccurs="0" name="execTime" type="xs:long"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+      <xs:element minOccurs="0" name="nodeName" type="xs:string"/>
+      <xs:element minOccurs="0" name="nodeType" type="xs:string"/>
+      <xs:element name="position" type="xs:int"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="subEntries" nillable="true" type="tns:logEntry"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chainsListResult">
+    <xs:complexContent>
+      <xs:extension base="tns:generalResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="resultSet" nillable="true" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="generalResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="buildVersion" type="xs:string"/>
+      <xs:element minOccurs="0" name="error" type="xs:string"/>
+      <xs:element name="invokationTime" type="xs:long"/>
+      <xs:element minOccurs="0" name="resultCode" type="tns:resultCodeType"/>
+      <xs:element minOccurs="0" name="resultDescription" type="xs:string"/>
+      <xs:element minOccurs="0" name="transactionId" type="xs:anyType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chainSignatureResult">
+    <xs:complexContent>
+      <xs:extension base="tns:generalResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="inputParameters" nillable="true" type="tns:chainVariableDTO"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="outputParameters" nillable="true" type="tns:chainVariableDTO"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="chainVariableDTO">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="required" type="xs:string"/>
+      <xs:element minOccurs="0" name="type" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chainResult">
+    <xs:complexContent>
+      <xs:extension base="tns:generalResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="resultList" nillable="true" type="tns:chainResultElement"/>
+          <xs:element minOccurs="0" name="businessError" type="tns:businessError"/>
+          <xs:element minOccurs="0" name="nodeName" type="xs:string"/>
+          <xs:element minOccurs="0" name="serverInfo" type="xs:string"/>
+          <xs:element minOccurs="0" name="chainVersion" type="xs:string"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="debugLog" nillable="true" type="tns:logEntry"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="chainResultElement">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="value" type="xs:anyType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getChainSignature">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="chainName" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegisteredChainsNamesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:chainsListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="executeDebugChainResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:chainResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="inputParameter">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="value" type="xs:anyType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="executeChain">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="chainRequest" type="tns:chainRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chainRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="chainName" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="inputParameters" nillable="true" type="tns:inputParameter"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="executeDebugChain">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="chainRequest" type="tns:chainRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getChainSignatureResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:chainSignatureResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegisteredChainsNames">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="executeChainResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:chainResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="entryType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="START"/>
+      <xs:enumeration value="STOP"/>
+      <xs:enumeration value="INFO"/>
+      <xs:enumeration value="ERROR"/>
+      <xs:enumeration value="WARN"/>
+      <xs:enumeration value="NODE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="resultCodeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="VALIDATION_FAILURE"/>
+      <xs:enumeration value="CHAIN_ERROR"/>
+      <xs:enumeration value="ERROR"/>
+      <xs:enumeration value="CHAIN_VALIDATION_FAILURE"/>
+      <xs:enumeration value="CHAIN_RUNTIME_ERROR"/>
+      <xs:enumeration value="CHAIN_ILLEGAL_STATE"/>
+      <xs:enumeration value="CHAIN_DATABASE_ERROR"/>
+      <xs:enumeration value="CHAIN_TRANSACTION_ERROR"/>
+      <xs:enumeration value="CHAIN_BUSINESS_ERROR"/>
+      <xs:enumeration value="CHAIN_SEMAPHORE_BUSY_ERROR"/>
+      <xs:enumeration value="CHAIN_SEMAPHORE_MAX_COUNT_REACHED_ERROR"/>
+      <xs:enumeration value="CHAIN_UNKNOWN_ERROR"/>
+      <xs:enumeration value="PROMO_ILLEGAL_STATE"/>
+      <xs:enumeration value="PROMO_INTERNAL_ERROR"/>
+      <xs:enumeration value="PROMO_BUSINESS_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="astelit.ukr:fm:common:ws" targetNamespace="astelit.ukr:fm:common:ws" version="1.0">
+
+  <xs:element name="generalResult" type="tns:generalResult"/>
+
+  <xs:complexType abstract="true" name="paginationGeneralResult">
+    <xs:complexContent>
+      <xs:extension base="tns:generalResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="numberAllItems" type="xs:int"/>
+          <xs:element minOccurs="0" name="numberAllPages" type="xs:int"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="generalResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="commonResult" type="tns:result"/>
+      <xs:element minOccurs="0" name="invokeTime" type="xs:long"/>
+      <xs:element minOccurs="0" name="transactionId" type="xs:anyType"/>
+      <xs:element name="resultByAppenders">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" name="key" type="xs:string"/>
+                  <xs:element minOccurs="0" name="value" type="tns:result"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="result">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="resultCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="resultDescription" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="astelit.ukr:fm" xmlns:ns2="http://chain.api.ws.rtn.idr.astelit.ukr/" xmlns:ns1="astelit.ukr:fm:common:ws" elementFormDefault="unqualified" targetNamespace="astelit.ukr:fm" version="1.0">
+
+  <xs:import namespace="astelit.ukr:fm:common:ws"/>
+
+  <xs:import namespace="http://chain.api.ws.rtn.idr.astelit.ukr/"/>
+
+  <xs:element name="chainExecutionResult" type="tns:chainExecutionResult"/>
+
+  <xs:element name="doCorrection" type="tns:doCorrection"/>
+
+  <xs:element name="doCorrectionResponse" type="tns:doCorrectionResponse"/>
+
+  <xs:element name="doPayment" type="tns:doPayment"/>
+
+  <xs:element name="doPaymentResponse" type="tns:doPaymentResponse"/>
+
+  <xs:element name="doReversal" type="tns:doReversal"/>
+
+  <xs:element name="doReversalResponse" type="tns:doReversalResponse"/>
+
+  <xs:element name="getRegistryContent" type="tns:getRegistryContent"/>
+
+  <xs:element name="getRegistryContentModelResponse" type="tns:getRegistryContentModelResponse"/>
+
+  <xs:element name="getRegistryContentResponse" type="tns:getRegistryContentResponse"/>
+
+  <xs:element name="getRegistryDetails" type="tns:getRegistryDetails"/>
+
+  <xs:element name="getRegistryDetailsResponse" type="tns:getRegistryDetailsResponse"/>
+
+  <xs:element name="getStatementContent" type="tns:getStatementContent"/>
+
+  <xs:element name="getStatementContentResponse" type="tns:getStatementContentResponse"/>
+
+  <xs:element name="getStatementDetails" type="tns:getStatementDetails"/>
+
+  <xs:element name="getStatementDetailsResponse" type="tns:getStatementDetailsResponse"/>
+
+  <xs:element name="getStatementTypes" type="tns:getStatementTypes"/>
+
+  <xs:element name="getStatementTypesResponse" type="tns:getStatementTypesResponse"/>
+
+  <xs:element name="registryDetailRow" type="tns:registryDetailRow"/>
+
+  <xs:complexType name="getStatementDetails">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:getStatementDetailsRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementDetailsRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:generalRequest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="statementFilter" type="tns:getStatementDetailsModelRequest"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="generalRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="channel" type="xs:string"/>
+      <xs:element minOccurs="0" name="pagination" type="tns:pagination"/>
+      <xs:element minOccurs="0" name="profileId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementDetailsModelRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="finishLastOperDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishPeriodDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishTimeMakeDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishTurnDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="settlementAccount" type="xs:string"/>
+      <xs:element minOccurs="0" name="startLastOperDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startPeriodDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startTimeMakeDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startTurnDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="statementType" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pagination">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="itemsPerPage" type="xs:int"/>
+      <xs:element minOccurs="0" name="page" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementDetailsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:getStatementDetailsResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementDetailsResult">
+    <xs:complexContent>
+      <xs:extension base="ns1:paginationGeneralResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="statementDetailList" type="tns:getStatementDetailsModelResponse"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementDetailsModelResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="statementDetailRow" nillable="true" type="tns:statementDetailsRow"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="statementDetailsRow">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="code" type="xs:string"/>
+      <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="inRestAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="lastOperDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="outRestAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="periodDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="recordCount" type="xs:string"/>
+      <xs:element minOccurs="0" name="settlementAccount" type="xs:string"/>
+      <xs:element minOccurs="0" name="statementTypeCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="timeMakeDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="timeTurnDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="turnDebAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="turnKreAmount" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="doPayment">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:financialTransactionRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="financialTransactionRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:generalRequest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="customerPayment" type="tns:customerPayment"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="customerPayment">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:string"/>
+      <xs:element minOccurs="0" name="amount" type="tns:money"/>
+      <xs:element minOccurs="0" name="remainingAmount" type="tns:money"/>
+      <xs:element minOccurs="0" name="paymentDate" type="xs:dateTime"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="paymentReceivedFor" nillable="true" type="tns:customerAccount"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="customerPaymentDescribedBySpec" nillable="true" type="tns:customerPaymentSpecification"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="money">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="amount" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="units" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="customerAccount">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="customerAccountReferences" nillable="true" type="tns:customerAccount"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="customerAccountInteractionsRoles" nillable="true" type="tns:customerAccountInteractionRole"/>
+      <xs:element minOccurs="0" name="customerBillingAccount" type="tns:customerBillingAccount"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="paymentReceivedFor" nillable="true" type="tns:customerPayment"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="customerAccountInteractionRole">
+    <xs:complexContent>
+      <xs:extension base="tns:businessInteractionRole">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="customerAccount" type="tns:customerAccount"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="businessInteractionRole">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="businessInteractionInvolves" type="tns:businessInteraction"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="businessInteraction">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="businessInteractionRoles" nillable="true" type="tns:businessInteractionRole"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="businessInteractionDescrBy" nillable="true" type="tns:generalCharacteristicValue"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generalCharacteristicValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="value" type="xs:string"/>
+      <xs:element minOccurs="0" name="specificationCharacteristic" type="tns:generalSpecificationCharacteristic"/>
+      <xs:element minOccurs="0" name="valueInstantiatedByEnum" type="tns:generalSpecificationCharacteristicValue"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generalSpecificationCharacteristic">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="characteristicEnumeratedBy" nillable="true" type="tns:generalSpecificationCharacteristicValue"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="characteristicValues" nillable="true" type="tns:generalCharacteristicValue"/>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generalSpecificationCharacteristicValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="generalSpecificationCharacteristic" type="tns:generalSpecificationCharacteristic"/>
+      <xs:element minOccurs="0" name="value" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="agreement">
+    <xs:complexContent>
+      <xs:extension base="tns:businessInteraction">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="documentNumber" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="customerBillingAccount">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="customerAccount" type="tns:customerAccount"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="customerBillingAccountDescBySpec" nillable="true" type="tns:customerBillingAccountSpecification"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="customerBillingAccountSpecification">
+    <xs:complexContent>
+      <xs:extension base="tns:generalSpecification">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="customerBillingAccountDescBySpec" nillable="true" type="tns:customerBillingAccount"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="generalSpecification">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="specificationDescribedBy" nillable="true" type="tns:generalSpecificationCharacteristic"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="specificationEnumeratedBy" nillable="true" type="tns:generalSpecificationCharacteristicValue"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="customerPaymentSpecification">
+    <xs:complexContent>
+      <xs:extension base="tns:generalSpecification">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="customerPaymentDescrBySpec" nillable="true" type="tns:customerPayment"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="doPaymentResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:generalOperateResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generalOperateResult">
+    <xs:complexContent>
+      <xs:extension base="ns1:generalResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="chainResults" nillable="true" type="tns:chainExecutionResult"/>
+          <xs:element minOccurs="0" name="chainName" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="chainExecutionResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="code" type="tns:resultCode"/>
+      <xs:element minOccurs="0" name="error" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="result" nillable="true" type="tns:chainVar"/>
+      <xs:element minOccurs="0" name="chain" type="xs:string"/>
+      <xs:element minOccurs="0" name="businessError" type="ns2:businessError"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chainVar">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="varName" type="xs:string"/>
+      <xs:element minOccurs="0" name="varValue" type="xs:anyType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="doReversal">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:financialTransactionRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="doReversalResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:generalOperateResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="doCorrection">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:financialTransactionRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="doCorrectionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:generalOperateResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementTypes">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:generalRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementTypesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:getStatementTypesResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementTypesResult">
+    <xs:complexContent>
+      <xs:extension base="ns1:paginationGeneralResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="statementTypesList" type="tns:getStatementTypesModelResponse"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementTypesModelResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="type" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryDetails">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:getRegistryDetailsRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryDetailsRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:generalRequest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="registryFilter" type="tns:getRegistryDetailsModelRequest"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryDetailsModelRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="finishAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishEntryDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishFileDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="paymentAgentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentAgentName" type="xs:string"/>
+      <xs:element minOccurs="0" name="registryCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="startAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startEntryDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startFileDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryDetailsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:getRegistryDetailsResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryDetailsResult">
+    <xs:complexContent>
+      <xs:extension base="ns1:paginationGeneralResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="registryDetailList" type="tns:getRegistryDetailModelResponse"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryDetailModelResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="registryDetailRow" nillable="true" type="tns:registryDetailRow"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="registryDetailRow">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="entryDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="auditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="fileDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="registryCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentAgentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentAgentName" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentSubagentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentSubagentName" type="xs:string"/>
+      <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="totalCount" type="xs:string"/>
+      <xs:element minOccurs="0" name="totalAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="payableAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="comissionAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="reconcilliationStatus" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryContent">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:getRegistryContentRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryContentRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:generalRequest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="registryFilter" type="tns:getRegistryContentModelRequest"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryContentModelRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="agreementNo" type="xs:string"/>
+      <xs:element minOccurs="0" name="amount" type="xs:string"/>
+      <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="finishAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishEntryDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishFileDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="invoiceNo" type="xs:string"/>
+      <xs:element minOccurs="0" name="isPaymentMatched" type="xs:string"/>
+      <xs:element minOccurs="0" name="msisdn" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentAgentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentAgentName" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentDescription" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentFinishAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="paymentStartAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="registryCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="startAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startEntryDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startFileDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="subFullName" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryContentResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:getRegistryContentResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryContentResult">
+    <xs:complexContent>
+      <xs:extension base="ns1:paginationGeneralResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="registryContentList" type="tns:getRegistryContentModelResponse"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getRegistryContentModelResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="registryContentRow" nillable="true" type="tns:registryContentRow"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="registryContentRow">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="agreementNo" type="xs:string"/>
+      <xs:element minOccurs="0" name="amount" type="xs:string"/>
+      <xs:element minOccurs="0" name="finHistoryCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="invoiceNo" type="xs:string"/>
+      <xs:element minOccurs="0" name="msisdn" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentAgentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="paymentDescription" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentString" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymetAgentName" type="xs:string"/>
+      <xs:element minOccurs="0" name="reconcilliationStatus" type="xs:string"/>
+      <xs:element minOccurs="0" name="registryAuditDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="registryCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="registryFileDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="registryFileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="subFullName" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementContent">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:getStatementContentRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementContentRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:generalRequest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="statementFilter" type="tns:getStatementContentModelRequest"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementContentModelRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="accKorr" type="xs:string"/>
+      <xs:element minOccurs="0" name="detPay" type="xs:string"/>
+      <xs:element minOccurs="0" name="docn" type="xs:string"/>
+      <xs:element minOccurs="0" name="fileName" type="xs:string"/>
+      <xs:element minOccurs="0" name="finishLastOperDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishPeriodDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishTimeMakeDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="finishTurnDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="nameKorr" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentFound" type="xs:string"/>
+      <xs:element minOccurs="0" name="registryFound" type="xs:string"/>
+      <xs:element minOccurs="0" name="settlementAccount" type="xs:string"/>
+      <xs:element minOccurs="0" name="startLastOperDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startPeriodDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startTimeMakeDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="startTurnDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="statementCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="statementType" type="xs:string"/>
+      <xs:element minOccurs="0" name="sumOperAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="unpkorr" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementContentResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:getStatementContentResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementContentResult">
+    <xs:complexContent>
+      <xs:extension base="ns1:paginationGeneralResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="statementDetailList" type="tns:getStatementContentModelResponse"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getStatementContentModelResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="statementContentRow" nillable="true" type="tns:statementContentRow"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="statementContentRow">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="accKorr" type="xs:string"/>
+      <xs:element minOccurs="0" name="detPay" type="xs:string"/>
+      <xs:element minOccurs="0" name="docn" type="xs:string"/>
+      <xs:element minOccurs="0" name="mfoKorr" type="xs:string"/>
+      <xs:element minOccurs="0" name="nameKorr" type="xs:string"/>
+      <xs:element minOccurs="0" name="paymentFound" type="xs:string"/>
+      <xs:element minOccurs="0" name="periodDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="registryFound" type="xs:string"/>
+      <xs:element minOccurs="0" name="registyCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="settlementAccount" type="xs:string"/>
+      <xs:element minOccurs="0" name="statementCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="statementContentCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="statementType" type="xs:string"/>
+      <xs:element minOccurs="0" name="sumOperAmount" type="xs:string"/>
+      <xs:element minOccurs="0" name="unpKorr" type="xs:string"/>
+      <xs:element minOccurs="0" name="uploadDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="resultCode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="INTERNAL_ERROR"/>
+      <xs:enumeration value="CHAIN_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getStatementDetails">
+    <wsdl:part element="tns:getStatementDetails" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doReversalResponse">
+    <wsdl:part element="tns:doReversalResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doPayment">
+    <wsdl:part element="tns:doPayment" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doReversal">
+    <wsdl:part element="tns:doReversal" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doCorrection">
+    <wsdl:part element="tns:doCorrection" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doCorrectionResponse">
+    <wsdl:part element="tns:doCorrectionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatementDetailsResponse">
+    <wsdl:part element="tns:getStatementDetailsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getRegistryDetails">
+    <wsdl:part element="tns:getRegistryDetails" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getRegistryContent">
+    <wsdl:part element="tns:getRegistryContent" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatementContent">
+    <wsdl:part element="tns:getStatementContent" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatementContentResponse">
+    <wsdl:part element="tns:getStatementContentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getRegistryDetailsResponse">
+    <wsdl:part element="tns:getRegistryDetailsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doPaymentResponse">
+    <wsdl:part element="tns:doPaymentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatementTypesResponse">
+    <wsdl:part element="tns:getStatementTypesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getRegistryContentResponse">
+    <wsdl:part element="tns:getRegistryContentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStatementTypes">
+    <wsdl:part element="tns:getStatementTypes" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="FinancialManagementService">
+    <wsdl:operation name="getStatementDetails">
+      <wsdl:input message="tns:getStatementDetails" name="getStatementDetails">
+    </wsdl:input>
+      <wsdl:output message="tns:getStatementDetailsResponse" name="getStatementDetailsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doPayment">
+      <wsdl:input message="tns:doPayment" name="doPayment">
+    </wsdl:input>
+      <wsdl:output message="tns:doPaymentResponse" name="doPaymentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doReversal">
+      <wsdl:input message="tns:doReversal" name="doReversal">
+    </wsdl:input>
+      <wsdl:output message="tns:doReversalResponse" name="doReversalResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doCorrection">
+      <wsdl:input message="tns:doCorrection" name="doCorrection">
+    </wsdl:input>
+      <wsdl:output message="tns:doCorrectionResponse" name="doCorrectionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStatementTypes">
+      <wsdl:input message="tns:getStatementTypes" name="getStatementTypes">
+    </wsdl:input>
+      <wsdl:output message="tns:getStatementTypesResponse" name="getStatementTypesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getRegistryDetails">
+      <wsdl:input message="tns:getRegistryDetails" name="getRegistryDetails">
+    </wsdl:input>
+      <wsdl:output message="tns:getRegistryDetailsResponse" name="getRegistryDetailsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getRegistryContent">
+      <wsdl:input message="tns:getRegistryContent" name="getRegistryContent">
+    </wsdl:input>
+      <wsdl:output message="tns:getRegistryContentResponse" name="getRegistryContentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStatementContent">
+      <wsdl:input message="tns:getStatementContent" name="getStatementContent">
+    </wsdl:input>
+      <wsdl:output message="tns:getStatementContentResponse" name="getStatementContentResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FinancialManagementSoapBinding" type="tns:FinancialManagementService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getStatementDetails">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getStatementDetails">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getStatementDetailsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doPayment">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doPayment">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doPaymentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doReversal">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doReversal">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doReversalResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doCorrection">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doCorrection">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doCorrectionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStatementTypes">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getStatementTypes">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getStatementTypesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getRegistryDetails">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getRegistryDetails">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getRegistryDetailsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getRegistryContent">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getRegistryContent">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getRegistryContentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStatementContent">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getStatementContent">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getStatementContentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FinancialManagement">
+    <wsdl:port binding="tns:FinancialManagementSoapBinding" name="FinancialManagementPort">
+      <soap:address location="http://dev-test-tm-fm-1.dev.ict:8080/astelit-fm-ws/fm-services/fm"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

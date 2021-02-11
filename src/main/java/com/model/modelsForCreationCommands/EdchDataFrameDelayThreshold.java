@@ -1,9 +1,11 @@
 package com.model.modelsForCreationCommands;
 
 import com.model.modelsForCreationCommands.util.CreationCommand;
-import com.utils.Patterns;
+import com.model.modelsForCreationCommands.util.FieldExtractor;
+import com.model.modelsForCreationCommands.util.ModelUtils;
+import com.model.Patterns;
 
-import java.util.List;
+import java.util.Map;
 
 public class EdchDataFrameDelayThreshold implements CreationCommand {
 
@@ -16,6 +18,17 @@ public class EdchDataFrameDelayThreshold implements CreationCommand {
   private String name;
   private int edchDataFrameDelayThreshold;
   private String userLabel;
+  private String[] source;
+
+  public EdchDataFrameDelayThreshold() {
+  }
+
+  public EdchDataFrameDelayThreshold(String[] source) {
+    this.source = source;
+    name = source[0];
+    edchDataFrameDelayThreshold = FieldExtractor.getFieldIntPrimitive(source, "edchDataFrameDelayThreshold");
+    userLabel = FieldExtractor.getFieldString(source, "userLabel");
+  }
 
   public String getName() {
     return name;
@@ -47,12 +60,21 @@ public class EdchDataFrameDelayThreshold implements CreationCommand {
   }
 
   @Override
-  public List<?> getValues() {
-    return null;
+  public Map<String,String> getValues() {
+    Map<String, String> values = ModelUtils.createMapProperties(source);
+    return values;
   }
 
   @Override
-  public String getType() {
-    return null;
+  public Patterns getType() {
+    return Patterns.EDCH_DATA_FRAME_DELAY_THRESHOLD;
+  }
+
+  @Override
+  public String toString() {
+    return "crn " + name + "\n" +
+        "edchDataFrameDelayThreshold " + edchDataFrameDelayThreshold + "\n" +
+        "userLabel " + (userLabel == null ? "" : userLabel) + "\n" +
+        "end\n\n";
   }
 }

@@ -1,10 +1,11 @@
 package com.model.modelsForCreationCommands;
 
 import com.model.modelsForCreationCommands.util.CreationCommand;
-import com.utils.Patterns;
+import com.model.modelsForCreationCommands.util.FieldExtractor;
+import com.model.modelsForCreationCommands.util.ModelUtils;
+import com.model.Patterns;
 
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 public class ENodeBId implements CreationCommand {
 
@@ -24,21 +25,19 @@ public class ENodeBId implements CreationCommand {
   private int physicalCellIdentity;
   private int tac;
   private String userLabel;
-
-  final String begin = "RncFunction=[0-9]*,";
-  final String end = "[\\s\\n\\w\\.,=-]*[\\s\\n]*";
-  final Pattern pattern = Pattern.compile(begin + "EutraNetwork=[a-zA-Z]*,EutranFrequency=[\\d]*,ExternalEutranCell=[\\w]*" + end);
+  private String[] source;
 
   public ENodeBId() {
   }
 
   public ENodeBId(String[] values) {
+    this.source = values;
     name = values[0];
-    cellId = values[1].split("\\s").length == 2 ? Integer.parseInt(values[0].split("\\s")[1]) : null;
-    eNodeBId = values[2].split("\\s").length == 2 ? Integer.parseInt(values[0].split("\\s")[1]) : null;
-    physicalCellIdentity = values[3].split("\\s").length == 2 ? Integer.parseInt(values[0].split("\\s")[1]) : null;
-    tac = values[4].split("\\s").length == 2 ? Integer.parseInt(values[0].split("\\s")[1]) : null;
-    userLabel = values[5].split("\\s").length == 2 ? values[0].split("\\s")[1] : null;
+    cellId = FieldExtractor.getFieldIntPrimitive(source, "cellId");
+    eNodeBId = FieldExtractor.getFieldIntPrimitive(source, "eNodeBId");
+    physicalCellIdentity = FieldExtractor.getFieldIntPrimitive(source, "physicalCellIdentity");
+    tac = FieldExtractor.getFieldIntPrimitive(source, "tac");
+    userLabel = FieldExtractor.getFieldString(source, "userLabel");
   }
 
   public String getName() {
@@ -95,12 +94,24 @@ public class ENodeBId implements CreationCommand {
   }
 
   @Override
-  public List<?> getValues() {
-    return null;
+  public Map<String,String> getValues() {
+    Map<String, String> values = ModelUtils.createMapProperties(source);
+    return values;
   }
 
   @Override
-  public String getType() {
-    return null;
+  public Patterns getType() {
+    return Patterns.E_NODEB_ID;
+  }
+
+  @Override
+  public String toString() {
+    return "crn " + name + "\n" +
+        "cellId " + cellId + "\n" +
+        "eNodeBId " + eNodeBId + "\n" +
+        "physicalCellIdentity " + physicalCellIdentity + "\n" +
+        "tac " + tac + "\n" +
+        "userLabel " + (userLabel == null ? "" : userLabel) + "\n" +
+        "end\n\n";
   }
 }

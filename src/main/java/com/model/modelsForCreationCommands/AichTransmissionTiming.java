@@ -1,9 +1,12 @@
 package com.model.modelsForCreationCommands;
 
 import com.model.modelsForCreationCommands.util.CreationCommand;
-import com.utils.Patterns;
+import com.model.modelsForCreationCommands.util.FieldExtractor;
+import com.model.modelsForCreationCommands.util.ModelUtils;
+import com.model.Patterns;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
 
 public class AichTransmissionTiming implements CreationCommand {
 
@@ -44,6 +47,33 @@ public class AichTransmissionTiming implements CreationCommand {
   private int spreadingFactor;
   private int subChannelNo;
   private String userLabel;
+  private String[] source;
+
+  private int i = 0;
+
+  public AichTransmissionTiming() {
+  }
+
+  public AichTransmissionTiming(String[] source) {
+    this.source = source;
+    name = source[0];
+    administrativeState = FieldExtractor.getFieldIntPrimitive(source, "administrativeState");
+    aichPower = FieldExtractor.getFieldIntPrimitive(source, "aichPower");
+    aichTransmissionTiming = FieldExtractor.getFieldIntPrimitive(source, "aichTransmissionTiming");
+    constantValueCprach = FieldExtractor.getFieldIntPrimitive(source, "constantValueCprach");
+    increasedRachCoverageEnabled = FieldExtractor.getFieldIntPrimitive(source, "increasedRachCoverageEnabled");
+    maxPreambleCycle = FieldExtractor.getFieldIntPrimitive(source, "maxPreambleCycle");
+    nb01Max = FieldExtractor.getFieldIntPrimitive(source, "nb01Max");
+    nb01Min = FieldExtractor.getFieldIntPrimitive(source, "nb01Min");
+    powerOffsetP0 = FieldExtractor.getFieldIntPrimitive(source, "powerOffsetP0");
+    powerOffsetPpm = FieldExtractor.getFieldIntPrimitive(source, "powerOffsetPpm");
+    preambleRetransMax = FieldExtractor.getFieldIntPrimitive(source, "preambleRetransMax");
+    preambleSignatures = FieldExtractor.getFieldIntPrimitive(source, "preambleSignatures");
+    scramblingCodeWordNo = FieldExtractor.getFieldIntPrimitive(source, "scramblingCodeWordNo");
+    spreadingFactor = FieldExtractor.getFieldIntPrimitive(source, "spreadingFactor");
+    subChannelNo = FieldExtractor.getFieldIntPrimitive(source, "subChannelNo");
+    userLabel = FieldExtractor.getFieldString(source, "userLabel");
+  }
 
   public String getName() {
     return name;
@@ -187,12 +217,56 @@ public class AichTransmissionTiming implements CreationCommand {
   }
 
   @Override
-  public List<?> getValues() {
-    return null;
+  public Map<String,String> getValues() {
+    Map<String, String> values;
+//    values.put("crn", name);
+//    values.put("administrativeState", administrativeState);
+//    values.put("aichPower", aichPower);
+//    values.put("aichTransmissionTiming", aichTransmissionTiming);
+//    values.put("constantValueCprach", constantValueCprach);
+//    values.put("increasedRachCoverageEnabled", increasedRachCoverageEnabled);
+//    values.put("maxPreambleCycle", maxPreambleCycle);
+//    values.put("nb01Max", nb01Max);
+//    values.put("nb01Min", nb01Min);
+//    values.put("powerOffsetP0", powerOffsetP0);
+//    values.put("powerOffsetPpm", powerOffsetPpm);
+//    values.put("preambleRetransMax", preambleRetransMax);
+//    values.put("preambleSignatures", preambleSignatures);
+//    values.put("spreadingFactor", spreadingFactor);
+//    values.put("subChannelNo", subChannelNo);
+//    values.put("userLabel", (userLabel == null ? "" : userLabel));
+
+    values = ModelUtils.createMapProperties(source);
+
+    return values == null ? Collections.emptyMap() : values;
   }
 
   @Override
-  public String getType() {
-    return null;
+  public Patterns getType() {
+    return Patterns.AICH_TRANSMISSION_TIMING;
   }
+
+  @Override
+  public String toString() {
+    return "crn " + name + "\n" +
+        "administrativeState " + administrativeState + "\n" +
+        "aichPower " + aichPower + "\n" +
+        "aichTransmissionTiming " + aichTransmissionTiming + "\n" +
+        "constantValueCprach " + constantValueCprach + "\n" +
+        "increasedRachCoverageEnabled " + increasedRachCoverageEnabled + "\n" +
+        "maxPreambleCycle " + maxPreambleCycle + "\n" +
+        "nb01Max " + nb01Max + "\n" +
+        "nb01Min " + nb01Min + "\n" +
+        "powerOffsetP0 " + powerOffsetP0 + "\n" +
+        "powerOffsetPpm " + powerOffsetPpm + "\n" +
+        "preambleRetransMax " + preambleRetransMax + "\n" +
+        "preambleSignatures " + preambleSignatures + "\n" +
+        "scramblingCodeWordNo " + scramblingCodeWordNo + "\n" +
+        "spreadingFactor " + spreadingFactor + "\n" +
+        "subChannelNo " + subChannelNo + "\n" +
+        "userLabel " + (userLabel == null ? "" : userLabel) + "\n" +
+        "end\n\n";
+  }
+
+
 }

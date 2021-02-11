@@ -1,19 +1,20 @@
 package com.controller;
 
-import com.dao.RncListRepository;
-import com.dao.RncRepository;
-import com.model.Rnc;
-import com.model.RncList;
-import com.model.UploadFileResponse;
-import com.service.FileStorageService;
-import com.service.ParseCsvFileService;
-import com.service.RncParseAndSave;
+//import com.dao.RncListRepository;
+//import com.dao.RncRepository;
+
+import com.exceptions.NotFoundRncException;
+import com.model.FileOfChanges2;
+import com.responses.Response;
+import com.exceptions.UploadFileException;
+import com.responses.StringResponse;
+import com.responses.UploadFileResponse;
+import com.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,61 +22,60 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", exposedHeaders = "Content-Disposition")
+@CrossOrigin(origins = {"http://10.1.34.94:80", "http://localhost:4200"}, exposedHeaders = "Content-Disposition")
+//@CrossOrigin(origins = "http://10.1.34.94:80", exposedHeaders = "Content-Disposition")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/rnc")
 public class FileController {
 
-  private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+  private final Logger LOG = LoggerFactory.getLogger(FileController.class);
   private static String lastFileName;
 
-  @Autowired
   private FileStorageService fileStorageService;
+  private FileParsingService fileParsingService;
+  private FileService fileService;
+  private ValidationService validateFileOfChanges;
 
   @Autowired
-  private ParseCsvFileService parseCsvFile;
+  public FileController(
+    FileStorageService fileStorageService,
+    FileParsingService parseCsvFile,
+    FileService fileService,
+    ValidationService validateFileOfChanges
+  ) {
+    this.fileStorageService = fileStorageService;
+    this.fileParsingService = parseCsvFile;
+    this.fileService = fileService;
+    this.validateFileOfChanges = validateFileOfChanges;
+  }
 
-  @Autowired
-  private RncParseAndSave rncParseAndSave;
+  @PostMapping("/upload")
+  public Response uploadRncMaximoTable(@RequestParam("file") MultipartFile file) {
+    if(!fileStorageService.validateFile(file)) {
+      return new UploadFileException("validation is unsuccessfully");
+    }
 
-  @Autowired
-  private RncRepository entityRepository;
-
-  @Autowired
-  private RncListRepository rncRepo;
-
-  @PostMapping("/uploadFile")
-  public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
     String fileName = fileStorageService.storeFile(file);
 
     FileController.lastFileName = fileName;
     String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-        .path("/downloadFile/")
+        .path("fileOfChanges/")
         .path(fileName)
         .toUriString();
 
-    rncParseAndSave.parseAndSave(fileName);
-    Map<String,List<String>> validation = fileStorageService.checkRncExisting(fileName);
-
     return new UploadFileResponse(fileName, fileDownloadUri,
-        file.getContentType(), file.getSize(), validation);
-  }
-
-  @GetMapping("/fileMap")
-  public List<Map<String, String>> getFileMapName() {
-    return parseCsvFile.readMapCsv(FileController.lastFileName);
+        file.getContentType(), file.getSize(), Collections.emptyMap());
   }
 
   @PostMapping(path = "/uploadMultipleFiles")
-  public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
+  public List<Response> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
     return Arrays.stream(files)
-        .map(this::uploadFile)
+        .map(this::uploadRncMaximoTable)
         .collect(Collectors.toList());
   }
 
@@ -88,12 +88,14 @@ public class FileController {
     try {
       contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
     } catch (IOException ex) {
-      logger.info("Could not determine file type.");
+      LOG.info("Could not determine file type.");
     }
 
     if(contentType == null) {
       contentType = "application/octet-stream";
     }
+
+    LOG.info("i am logger, log of application");
 
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(contentType))
@@ -101,55 +103,103 @@ public class FileController {
         .body(resource);
   }
 
-  @GetMapping("/downloadStrings")
-  public List<List<String>> downloadcsv() {
-    return parseCsvFile.readCsv(null);
-  }
 
-  @GetMapping("/fileNames")
+
+  @GetMapping(value = "/fileNames", produces = "application/json")
   public List<String> getFileNames() {
-    List<String> fileNames = Arrays.asList("RncMaximoTable.csv", "RncMaximoTable1.csv", "RncMaximoTable2.csv");
+    List<String> fileNames = Arrays.asList("RncMaximoTable.csv", "oldFileOfChanges/RncMaximoTable1.csv", "RncMaximoTable2.csv");
     return fileNames;
-  }
-
-  @GetMapping("/file/{id}")
-  public List<List<String>> getFileNames(@PathVariable String id) {
-    return parseCsvFile.readCsv(id);
   }
 
   @GetMapping("/fileMap/{id}")
   public List<Map<String, String>> getFileMapNames(@PathVariable String id) {
-    return parseCsvFile.readMapCsv(id);
+    return fileParsingService.readMapCsv(id);
   }
 
-  @PostMapping(path="/repo/add")
-  public @ResponseBody String addNewUser (@RequestBody Rnc entity) {
+  @GetMapping("recreate-file-of-changes")
+  public Object getLastFileChanges(HttpSession session) {
+    String filename = (String)session.getAttribute("filename");
+    if(null == filename) return new FileOfChanges2();
 
-    entityRepository.save(entity);
-    return "Saved";
-  }
+    FileOfChanges2 fileOfChanges2 = null;
 
-  @GetMapping(path="/repo/all")
-  public @ResponseBody Iterable<Rnc> getAllUsers() {
-
-    return entityRepository.findAll();
-  }
-
-  @PostMapping("/repo/save")
-  public HttpStatus addNewRnc(@RequestBody RncList rnc) {
-
-    rncRepo.save(rnc);
-
-    return HttpStatus.OK;
-  }
-
-  @GetMapping("/repo/check/{id}")
-  public boolean checkRnc(@PathVariable("id") int id) {
-    if(rncRepo.existsById(id)) {
-      return true;
+    try {
+      fileOfChanges2 = fileParsingService.loadFileOfChanges(filename);
+    } catch (NotFoundRncException e) {
+      return e.getNotFoundedExceptions().stream().map(Throwable::getMessage).collect(Collectors.toList());
     }
 
-    return false;
+    return fileOfChanges2;
+
   }
 
+  @GetMapping(value = "get-file-of-changes/{id}")
+  public Object getFileOfChanges(@PathVariable String id, HttpServletRequest request, HttpSession session) {
+    request.getSession().setAttribute("filename", id);
+
+    FileOfChanges2 fileOfChanges2 = null;
+
+    try {
+      fileOfChanges2 = fileParsingService.loadFileOfChanges(id);
+    } catch (NotFoundRncException e) {
+      return new StringResponse(e.getMessage() + " — " + e.getNotFoundedExceptions().stream().map(Throwable::getMessage).collect(Collectors.joining(", ")));
+    }
+
+    return fileOfChanges2;
+  }
+
+  @PostMapping("validate-file-of-changes")
+  public FileOfChanges2 validateFileOfChanges(@RequestBody FileOfChanges2 fileOfChanges2) {
+    return validateFileOfChanges.validateFileOfChanges(fileOfChanges2);
+  }
+
+  @GetMapping(value = "/download/files", produces="application/zip")
+  public ResponseEntity<Resource> downloadPreparedCreationCommandsFiles(HttpServletRequest request) throws Exception {
+
+    final Resource resource = fileService.getFileFromRemote();
+    LOG.info("from method downloadResultFiles");
+
+    String contentType = null;
+    try {
+      contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+    } catch (IOException ex) {
+      LOG.info("Could not determine file type.");
+    }
+
+    if(contentType == null) {
+      contentType = "application/zip";
+    }
+
+    return ResponseEntity.ok()
+      .contentLength(resource.contentLength())
+      .contentType(MediaType.parseMediaType(contentType))
+      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+      .body(resource);
+  }
+
+  /*
+  // TODO its code is important
+  @GetMapping("/modifyFile/{filename}")
+  public List<List<Map<String, String>>> preformModification(@PathVariable("filename") String fileOfChanges) {
+
+    System.out.println(fileOfChanges);
+
+    List<List<Map<String, String>>> listChangesAndListResults = new ArrayList<>();
+
+    parser.execute(fileOfChanges);
+
+    for (CreationCommand creationCommand : creationCommands) {
+      valuesAfter.add(creationCommand.getValues());
+    }
+
+    for (CreationCommand creationCommand : creationCommandsBefore) {
+      valuesBefore.add(creationCommand.getValues());
+    }
+
+    listChangesAndListResults.add(valuesBefore);
+    listChangesAndListResults.add(valuesAfter);
+
+    return listChangesAndListResults;
+  }
+   */
 }

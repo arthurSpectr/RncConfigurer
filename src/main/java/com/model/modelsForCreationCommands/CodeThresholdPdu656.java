@@ -1,9 +1,11 @@
 package com.model.modelsForCreationCommands;
 
 import com.model.modelsForCreationCommands.util.CreationCommand;
-import com.utils.Patterns;
+import com.model.modelsForCreationCommands.util.FieldExtractor;
+import com.model.modelsForCreationCommands.util.ModelUtils;
+import com.model.Patterns;
 
-import java.util.List;
+import java.util.Map;
 
 public class CodeThresholdPdu656 implements CreationCommand {
 
@@ -42,6 +44,30 @@ public class CodeThresholdPdu656 implements CreationCommand {
   private int numHsPdschCodes;
   private int numHsScchCodes;
   private String userLabel;
+  private String[] source;
+
+  public CodeThresholdPdu656() {
+  }
+
+  public CodeThresholdPdu656(String[] source) {
+    this.source = source;
+    name = source[0];
+    administrativeState = FieldExtractor.getFieldIntPrimitive(source, "administrativeState");
+    codeThresholdPdu656 = FieldExtractor.getFieldIntPrimitive(source, "codeThresholdPdu656");
+    cqiFeedbackCycle = FieldExtractor.getFieldIntPrimitive(source, "cqiFeedbackCycle");
+    deltaAck1 = FieldExtractor.getFieldIntPrimitive(source, "deltaAck1");
+    deltaAck2 = FieldExtractor.getFieldIntPrimitive(source, "deltaAck2");
+    deltaCqi1 = FieldExtractor.getFieldIntPrimitive(source, "deltaCqi1");
+    deltaCqi2 = FieldExtractor.getFieldIntPrimitive(source, "deltaCqi2");
+    deltaNack1 = FieldExtractor.getFieldIntPrimitive(source, "deltaNack1");
+    deltaNack2 = FieldExtractor.getFieldIntPrimitive(source, "deltaNack2");
+    hsMeasurementPowerOffset = FieldExtractor.getFieldIntPrimitive(source, "hsMeasurementPowerOffset");
+    initialAckNackRepetitionFactor = FieldExtractor.getFieldIntPrimitive(source, "initialAckNackRepetitionFactor");
+    initialCqiRepetitionFactor = FieldExtractor.getFieldIntPrimitive(source, "initialCqiRepetitionFactor");
+    numHsPdschCodes = FieldExtractor.getFieldIntPrimitive(source, "numHsPdschCodes");
+    numHsScchCodes = FieldExtractor.getFieldIntPrimitive(source, "numHsScchCodes");
+    userLabel = FieldExtractor.getFieldString(source, "userLabel");
+  }
 
   public String getName() {
     return name;
@@ -177,12 +203,34 @@ public class CodeThresholdPdu656 implements CreationCommand {
   }
 
   @Override
-  public List<?> getValues() {
-    return null;
+  public Map<String,String> getValues() {
+    Map<String, String> values = ModelUtils.createMapProperties(source);
+    return values;
   }
 
   @Override
-  public String getType() {
-    return null;
+  public Patterns getType() {
+    return Patterns.CODE_THRESHOLD_PDU_656;
+  }
+
+  @Override
+  public String toString() {
+    return "crn " + name + "\n" +
+        "administrativeState " + administrativeState + "\n" +
+        "codeThresholdPdu656 " + codeThresholdPdu656 + "\n" +
+        "cqiFeedbackCycle " + cqiFeedbackCycle + "\n" +
+        "deltaAck1 " + deltaAck1 + "\n" +
+        "deltaAck2 " + deltaAck2 + "\n" +
+        "deltaCqi1 " + deltaCqi1 + "\n" +
+        "deltaCqi2 " + deltaCqi2 + "\n" +
+        "deltaNack1 " + deltaNack1 + "\n" +
+        "deltaNack2 " + deltaNack2 + "\n" +
+        "hsMeasurementPowerOffset " + hsMeasurementPowerOffset + "\n" +
+        "initialAckNackRepetitionFactor " + initialAckNackRepetitionFactor + "\n" +
+        "initialCqiRepetitionFactor " + initialCqiRepetitionFactor + "\n" +
+        "numHsPdschCodes " + numHsPdschCodes + "\n" +
+        "numHsScchCodes " + numHsScchCodes + "\n" +
+        "userLabel " + (userLabel == null ? "" : userLabel) + "\n" +
+        "end\n\n";
   }
 }

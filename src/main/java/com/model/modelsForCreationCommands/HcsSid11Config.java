@@ -1,9 +1,11 @@
 package com.model.modelsForCreationCommands;
 
 import com.model.modelsForCreationCommands.util.CreationCommand;
-import com.utils.Patterns;
+import com.model.modelsForCreationCommands.util.FieldExtractor;
+import com.model.modelsForCreationCommands.util.ModelUtils;
+import com.model.Patterns;
 
-import java.util.List;
+import java.util.Map;
 
 public class HcsSid11Config implements CreationCommand {
 
@@ -27,6 +29,22 @@ public class HcsSid11Config implements CreationCommand {
   private int qOffset2sn;
   private int selectionPriority;
   private UtranCellRefBean utranCellRef;
+  private String[] source;
+
+  public HcsSid11Config() {
+  }
+
+  public HcsSid11Config(String[] source) {
+    this.source = source;
+    name = source[0];
+    hcsSib11Config = (HcsSib11ConfigBean)FieldExtractor.getFieldObject(HcsSib11ConfigBean.class, source, "hcsSib11Config");
+    loadSharingCandidate = FieldExtractor.getFieldIntPrimitive(source, "loadSharingCandidate");
+    mobilityRelationType = FieldExtractor.getFieldIntPrimitive(source, "mobilityRelationType");
+    qOffset1sn = FieldExtractor.getFieldIntPrimitive(source, "qOffset1sn");
+    qOffset2sn = FieldExtractor.getFieldIntPrimitive(source, "qOffset2sn");
+    selectionPriority = FieldExtractor.getFieldIntPrimitive(source, "selectionPriority");
+    utranCellRef = (UtranCellRefBean)FieldExtractor.getFieldObject(UtranCellRefBean.class, source, "utranCellRef");
+  }
 
   public String getName() {
     return name;
@@ -98,13 +116,14 @@ public class HcsSid11Config implements CreationCommand {
   }
 
   @Override
-  public List<?> getValues() {
-    return null;
+  public Map<String,String> getValues() {
+    Map<String, String> values = ModelUtils.createMapProperties(source);
+    return values;
   }
 
   @Override
-  public String getType() {
-    return null;
+  public Patterns getType() {
+    return Patterns.HCS_SIB_11_CONFIG;
   }
 
   public static class HcsSib11ConfigBean {
@@ -121,6 +140,19 @@ public class HcsSid11Config implements CreationCommand {
     private int penaltyTime;
     private int temporaryOffset1;
     private int temporaryOffset2;
+    private String allRow;
+
+    public HcsSib11ConfigBean() {
+    }
+
+    public HcsSib11ConfigBean(String source) {
+//      hcsPrio = source[0].split("=").length == 2 ? Integer.parseInt(source[0].split("=")[1]) : null;
+//      qHcs = source[0].split("=").length == 2 ? Integer.parseInt(source[1].split("=")[1]) : null;
+//      penaltyTime = source[0].split("=").length == 2 ? Integer.parseInt(source[2].split("=")[1]) : null;
+//      temporaryOffset1 = source[0].split("=").length == 2 ? Integer.parseInt(source[3].split("=")[1]) : null;
+//      temporaryOffset2 = source[0].split("=").length == 2 ? Integer.parseInt(source[4].split("=")[1]) : null;
+      allRow = source;
+    }
 
     public int getHcsPrio() {
       return hcsPrio;
@@ -161,6 +193,11 @@ public class HcsSid11Config implements CreationCommand {
     public void setTemporaryOffset2(int temporaryOffset2) {
       this.temporaryOffset2 = temporaryOffset2;
     }
+
+    @Override
+    public String toString() {
+      return allRow;
+    }
   }
 
   public static class UtranCellRefBean {
@@ -168,7 +205,23 @@ public class HcsSid11Config implements CreationCommand {
      * UtranCell : CK0001K
      */
 
+    private String prefix;
     private String UtranCell;
+
+    public UtranCellRefBean() {
+    }
+
+    public UtranCellRefBean(String src) {
+      final String[] source = src.split(",");
+      if(source[0].contains("IurLink")) {
+        prefix = "IurLink=";
+        UtranCell = source[0].split("=")[1] + "," + source[1];
+      } else {
+        prefix = "UtranCell=";
+        UtranCell = source[1];
+      }
+
+    }
 
     public String getUtranCell() {
       return UtranCell;
@@ -177,5 +230,23 @@ public class HcsSid11Config implements CreationCommand {
     public void setUtranCell(String UtranCell) {
       this.UtranCell = UtranCell;
     }
+
+    @Override
+    public String toString() {
+      return prefix + UtranCell;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "crn " + name + "\n" +
+        hcsSib11Config + "\n" +
+        "loadSharingCandidate " + loadSharingCandidate + "\n" +
+        "mobilityRelationType " + mobilityRelationType + "\n" +
+        "qOffset1sn " + qOffset1sn + "\n" +
+        "qOffset2sn " + qOffset2sn + "\n" +
+        "selectionPriority " + selectionPriority + "\n" +
+        "utranCellRef " + utranCellRef + "\n" +
+        "end\n\n";
   }
 }

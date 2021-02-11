@@ -1,15 +1,9 @@
 plugins {
-  id 'com.gradle.build-scan' version '2.0.2'
-  id 'org.springframework.boot' version '2.1.7.RELEASE'
-  id 'io.spring.dependency-management' version '1.0.7.RELEASE'
+  id 'org.springframework.boot' version '2.3.2.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.8.RELEASE'
   id 'java'
 }
 
-apply plugin: 'io.spring.dependency-management'
-
-springBoot {
-  mainClassName = "com.Application"
-}
 
 group 'com.parser'
 version '1.0-SNAPSHOT'
@@ -20,65 +14,101 @@ repositories repo
 
 dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.12'
-  compile group: 'log4j', name: 'log4j', version: '1.2.17'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.1'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.1'
 
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
   compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+  compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
   compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
   implementation 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
-  implementation 'org.springframework.boot:spring-boot-starter-web'
-  annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.5.RELEASE'
+
+  compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '2.2.5.RELEASE'
   implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+
   compile group: 'com.opencsv', name: 'opencsv', version: '4.0'
-  compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.18'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.2.1.RELEASE'
-//  compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.1.RELEASE'
+
+//  compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.18'
+//  compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.2.1.RELEASE'
+
+  // start dependencies for spring security
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.1.RELEASE'
   compile group: 'org.springframework.ldap', name: 'spring-ldap-core', version: '2.3.2.RELEASE'
-  compile("org.springframework.ldap:spring-ldap-core")
-  compile("org.springframework.security:spring-security-ldap")
-  compile("org.springframework:spring-tx")
-  compile("com.unboundid:unboundid-ldapsdk")
+  compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '5.2.2.RELEASE'
+  testCompile group: 'com.unboundid', name: 'unboundid-ldapsdk', version: '5.0.0'
+  // this dependency must be, Otherwise, Gradle fetches an older one that doesn’t work.
+  compile group: 'org.springframework', name: 'spring-tx', version: '5.2.8.RELEASE'
+
+  // for session management
+  implementation 'org.springframework.session:spring-session-data-redis'
+
+  compile group: 'redis.clients', name: 'jedis', version: '3.4.1'
+
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+// end block
+
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.3.3.RELEASE'
+
+
+  compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
+  compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
+
+  compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+  compile group: 'commons-net', name: 'commons-net', version: '3.6'
+
 
 }
 
-/*
-  config when angular placed in one project with spring boot in webapp
 
-def webappDir = "$projectDir/src/main/webapp"
+//  config when angular placed in one project with spring boot in webapp
+//def webappDir = "$projectDir/src/main/public"
 sourceSets {
   main {
     resources {
-      srcDirs = ["$webappDir/dist", "$projectDir/src/main/resources"]
+//      srcDirs = ["$webappDir", "$projectDir/src/main/resources"]
+      exclude '**/Rnc-ui/*'
+      exclude 'Rnc-ui/*'
+      exclude '/Rnc-ui/*'
+      exclude '*/Rnc-ui/*'
+      exclude 'Rnc-ui'
     }
   }
 }
 
 processResources {
-  dependsOn "buildAngular"
+//  dependsOn "buildAngular"
+  exclude '**/Rnc-ui/*'
+  exclude 'Rnc-ui/*'
+  exclude '/Rnc-ui/*'
+  exclude '*/Rnc-ui/*'
+  exclude 'Rnc-ui'
 }
-
-task buildAngular(type:Exec) {
+//
+//task buildAngular(type:Exec) {
 //  dependsOn "installAngular"
-  workingDir "$webappDir"
-  inputs.dir "$webappDir"
-  group = BasePlugin.BUILD_GROUP
-//	outputs.dir "$webappDir/dist"
-  if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-    commandLine "ng.cmd", "build"
-  } else {
-    commandLine "ng", "build"
-  }
-}
-
-task installAngular(type:Exec) {
-  workingDir "$webappDir"
-  inputs.dir "$webappDir"
-  group = BasePlugin.BUILD_GROUP
-  if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
-    commandLine "npm.cmd", "install"
-  } else {
-    commandLine "npm", "install"
-  }
-}
-*/
+//  workingDir "$webappDir"
+//  inputs.dir "$webappDir"
+//  group = BasePlugin.BUILD_GROUP
+////	outputs.dir "$webappDir/dist"
+//  if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
+//    commandLine "ng.cmd", "build"
+//  } else {
+//    commandLine "ng", "build"
+//  }
+//}
+//
+//task installAngular(type:Exec) {
+//  workingDir "$webappDir"
+//  inputs.dir "$webappDir"
+//  group = BasePlugin.BUILD_GROUP
+//  if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")){
+//    commandLine "npm.cmd", "install"
+//  } else {
+//    commandLine "npm", "install"
+//  }
+//}
 

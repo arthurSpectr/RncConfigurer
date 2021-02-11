@@ -1,9 +1,11 @@
 package com.model.modelsForCreationCommands;
 
 import com.model.modelsForCreationCommands.util.CreationCommand;
-import com.utils.Patterns;
+import com.model.modelsForCreationCommands.util.FieldExtractor;
+import com.model.modelsForCreationCommands.util.ModelUtils;
+import com.model.Patterns;
 
-import java.util.List;
+import java.util.Map;
 
 public class PchPower implements CreationCommand {
 
@@ -22,6 +24,20 @@ public class PchPower implements CreationCommand {
   private int pichPower;
   private int sccpchOffset;
   private String userLabel;
+  private String[] source;
+
+  public PchPower() {
+  }
+
+  public PchPower(String[] source) {
+    this.source = source;
+    name = source[0];
+    administrativeState = FieldExtractor.getFieldIntPrimitive(source, "administrativeState");
+    pchPower = FieldExtractor.getFieldIntPrimitive(source, "pchPower");
+    pichPower = FieldExtractor.getFieldIntPrimitive(source, "pichPower");
+    sccpchOffset = FieldExtractor.getFieldIntPrimitive(source, "sccpchOffset");
+    userLabel = FieldExtractor.getFieldString(source, "userLabel");
+  }
 
   public String getName() {
     return name;
@@ -77,12 +93,24 @@ public class PchPower implements CreationCommand {
   }
 
   @Override
-  public List<?> getValues() {
-    return null;
+  public Map<String,String> getValues() {
+    Map<String, String> values = ModelUtils.createMapProperties(source);
+    return values;
   }
 
   @Override
-  public String getType() {
-    return null;
+  public Patterns getType() {
+    return Patterns.PCH_POWER;
+  }
+
+  @Override
+  public String toString() {
+    return "crn " + name + "\n" +
+        "administrativeState " + administrativeState + "\n" +
+        "pchPower " + pchPower + "\n" +
+        "pichPower " + pichPower + "\n" +
+        "sccpchOffset " + sccpchOffset + "\n" +
+        "userLabel " + (userLabel == null ? "" : userLabel) + "\n" +
+        "end\n\n";
   }
 }

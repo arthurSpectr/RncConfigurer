@@ -1,4 +1,4 @@
-Object 1
+E_NODEB_ID
 {
 	name: "RncFunction=1,EutraNetwork=Astelit,EutranFrequency=1300,ExternalEutranCell=CK0001L31",
 	cellId: 31,
@@ -8,7 +8,7 @@ Object 1
 	userLabel: ''
 }
 
-Object 2
+BAND_INDICATOR
 {
 	name: "RncFunction=1,ExternalGsmNetwork=Astelit,ExternalGsmCell=CK00013",
 	bandIndicator: 0,
@@ -23,7 +23,7 @@ Object 2
 	userLabel: CK00013
 }
 
-Object 3
+EXTERNAL_GSM_CELL_REF
 {
 	name: "RncFunction=1,UtranCell=CK0029J,GsmRelation=CK00013",
 	externalGsmCellRef: {ExternalGsmNetwork: Astelit,ExternalGsmCell:CK00013},
@@ -32,7 +32,7 @@ Object 3
 	selectionPriority: 1
 }
 
-Object 4
+ATM_USER_PLANE_TERM_SUBRACK_REF -
 {
 	name: "RncFunction=1,IubLink=CK0001",
 	administrativeState: 1,
@@ -66,7 +66,7 @@ Object 4
 	userPlaneTransportOption: {atm:0,ipv4:1}
 }
 
-Object 5
+HCS_SIB_11_CONFIG
 {
 	name: "RncFunction=1,UtranCell=CK0108I,UtranRelation=CK0001K",
 	hcsSib11Config: {hcsPrio: 0,qHcs:0, penaltyTime:0,temporaryOffset1:0,temporaryOffset2:0},
@@ -78,7 +78,7 @@ Object 5
 	utranCellRef: {UtranCell:CK0001K},
 }
 
-Object 6
+EXTERNAL_EUTRAN_CELL_REF
 {
 	name: "RncFunction=1,UtranCell=CK0001K,EutranFreqRelation=1300,EutranCellRelation=1",
 	coSited: 1,
@@ -86,17 +86,17 @@ Object 6
 	userLabel: '' 
 }
 
-Object 7
+HS_PATH_LOSS_TRESHOLD
 {
 	name: "RncFunction=1,UtranCell=CK0001K,CoverageRelation=CK0001G",
 	coverageIndicator: 1,
 	hsIflsDownswitch: 1,
 	hsPathlossThreshold: 0,
 	relationCapability: { dchLoadSharing:1,hsCellSelection:0,hsLoadSharing:1,powerSave:0},
-	utranCellRef: { UtranCell:CK0001G},
+	utranCellRef: { UtranCell:CK0001G}
 }
 
-Object 8
+EU_DCH_BALANCING_ENABLED
 {
 	name: "RncFunction=1,UtranCell=CK0001K,Hsdsch=1,Eul=1",
 	administrativeState: 1,
@@ -116,7 +116,7 @@ Object 8
 	userLabel: ''
 }
 
-Object 9
+CODE_THRESHOLD_PDU_656
 {
 	name: "RncFunction=1,UtranCell=CK0001K,Hsdsch=1",
 	administrativeState: 1,
@@ -136,7 +136,7 @@ Object 9
 	userLabel: '' 
 }
 
-Object 10
+MAX_FACH_1_POWER
 {
 	name: "RncFunction=1,UtranCell=CK0001K,Fach=1",
 	administrativeState: 1,
@@ -148,7 +148,7 @@ Object 10
 	userLabel: '' 
 }
 
-Object 11
+PCH_POWER
 {
 	name: "RncFunction=1,UtranCell=CK0001K,Pch=1",
 	administrativeState: 1,
@@ -158,7 +158,7 @@ Object 11
 	userLabel: ''
 }
 
-Object 12
+AICH_TRANSMISSION_TIMING
 {
 	name: "RncFunction=1,UtranCell=CK0001K,Rach=1",
 	administrativeState: 1,
@@ -179,7 +179,7 @@ Object 12
 	userLabel: '' 
 }
 
-Object 13
+ASE_LOAD_THRESHOLD_UI_SPEECH
 {
 	name: "RncFunction=1,UtranCell=CK0001K",
 	absPrioCellRes: {cellReselectionPriority:3,sPrioritySearch1:10,sPrioritySearch2:4,threshServingLow:16,measIndFach:0},
@@ -353,16 +353,35 @@ Object 13
 	utranCellPosition: ''
 }
 
-Object 14
+SAC
 {
 	name: 'RncFunction=1,LocationArea=12710,ServiceArea=30563',
 	sac: 30563,
 	userLabel: '' 
 }
 
-Object 15
+EDCH_DATA_FRAME_DELAY_THRESHOLD
 {
 	name: 'RncFunction=1,IubLink=CK0001,IubEdch=1',
 	edchDataFrameDelayThreshold: 60,
 	userLabel: ''
+}
+
+BARRED_CN_OPERATOR_REF
+{
+    name: "RncFunction=1,UtranCell=CK0001K,EutranFreqRelation=1300",
+    barredCnOperatorRef: '',
+    blacklistedCell: '',
+    cellReselectionPriority: 5,
+    coSitedCellAvailable: 1,
+    eutranFrequencyRef: {EutraNetwork: Astelit,EutranFrequency: 1300},
+    qQualMin: 100,
+    qRxLevMin: -120,
+    redirectionOrder: 1,
+    thresh2dRwr: -85,
+    threshHigh: 10,
+    threshHigh2: 10,
+    threshLow: 6,
+    threshLow2: 10,
+    userLabel: ''
 }
