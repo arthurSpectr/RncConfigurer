@@ -10,6 +10,7 @@ import {Observable} from 'rxjs';
 // import {ShowResultComponent} from '../../show-result/show-result.component';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import * as myGlobals from '../../../services/globals';
 
 export interface PeriodicElement {
   RehomOrder: string;
@@ -25,8 +26,7 @@ export interface PeriodicElement {
   NewCI: string;
 }
 
-// const URL = 'http://10.1.34.94:80/api/uploadFile';
-const URL = 'http://localhost:80/api/uploadFile';
+const URL = myGlobals.API + 'v1/rnc/uploadFile';
 
 @Component({
   selector: 'app-table',

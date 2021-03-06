@@ -3,14 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import {delay, map} from 'rxjs/operators';
+import * as myGlobals from '../../services/globals';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DownloadService {
 
-  // public API = 'http://10.1.34.94:80/api/v1/rnc/';
-  public API = 'http://localhost:80/api/v1/rnc/';
+  public API = myGlobals.API + 'v1/rnc/';
 
   headers = {
     headers: new HttpHeaders({
@@ -46,11 +46,31 @@ export class DownloadService {
     return this.http.get(this.API + "recreate-file-of-changes/");
   }
 
+  reCreateValidatedFileOfChanges(): Observable<any> {
+    return this.http.get(this.API + "recreate-validated-file-of-changes/");
+  }
+
+  reCreateAvailableFileOfChanges(): Observable<any> {
+    return this.http.get(this.API + "recreate-available-file-of-changes/");
+  }
+
   validateRnc(file: any): Observable<any> {
     return this.http.post(this.API + "validate-file-of-changes", file);
   }
 
+  checkAvailableparams(file: any): Observable<any> {
+    return this.http.post(this.API + "check-available-params", file);
+  }
+
   inputChanges(fileOfChanges: string): Promise<object> {
     return this.http.get(this.API + 'modifyFile/' + fileOfChanges).toPromise();
+  }
+
+  getAlarmFile(file: string) {
+    return this.http.get(this.API + 'get-alarm-file/' + file);
+  }
+
+  downloadAlarmFile(fileName): Observable<any> {
+    return this.http.get(this.API + 'download-alarm-file/' + fileName, {responseType: 'blob', observe: 'response'});
   }
 }

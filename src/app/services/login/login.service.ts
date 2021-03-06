@@ -5,14 +5,12 @@ import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import {error} from "@angular/compiler/src/util";
+import * as myGlobals from '../globals';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
-
-  // API = 'http://10.1.34.94:80/api/';
-  API = 'http://localhost:80/api/';
 
   constructor(private httpClient: HttpClient, private router: Router, private cookieService: CookieService) { }
 
@@ -30,7 +28,7 @@ export class LoginService {
     // this.headers.append('Cookie', this.cookieService.get('JSESSIONID'));
     // this.headers.append("Authorization", 'Basic ' + btoa(username + ':' + password));
 
-    return this.httpClient.post(this.API + 'login', this.form, {withCredentials: true, headers: this.headers}).pipe(
+    return this.httpClient.post(myGlobals.API + 'login', this.form, {withCredentials: true, headers: this.headers}).pipe(
       map(
         userData => {
           sessionStorage.setItem('username', username);
@@ -43,7 +41,7 @@ export class LoginService {
   }
 
   getToken() {
-    return this.httpClient.get(this.API + 'v1/rnc/token');
+    return this.httpClient.get(myGlobals.API + 'v1/rnc/token');
   }
 
   isUserLoggedIn() {
@@ -52,7 +50,7 @@ export class LoginService {
   }
 
   logOut() {
-   this.httpClient.post(this.API + 'logout', '').subscribe(data => {
+   this.httpClient.post(myGlobals.API + 'logout', '').subscribe(data => {
       console.log('succesfully logout');
       sessionStorage.clear();
       this.router.navigate(['login']);
