@@ -14,7 +14,7 @@
   margin-left: 10px;
   background: whitesmoke; /* Цвет фона */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
-  line-height: 3;
+  line-height: 4;
   position: relative;
 }
 
@@ -38,12 +38,14 @@
   font-size: 14px;
   font-weight: 400;
 
+ 
+
   background-color: #3F51B5;
   color: white;
 }
 
 .grid__body {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -70,3 +72,30 @@
   text-align: center;
   width: 60%;
 }
+
+.invalid {
+  background-color: red
+}
+
+.valid {
+  background-size: 0;
+}
+
+
+// .cell {
+//   line-height: 3;
+//   // padding: 5px;
+// }
+
+// .cell-value {
+//   line-height: 3;
+// }
+
+// .grid__body__line {
+//   // height: 50px;
+//   vertical-align: middle;
+// }
+
+// .cell-option {
+
+// }

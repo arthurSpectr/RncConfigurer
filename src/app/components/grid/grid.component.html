@@ -1,5 +1,3 @@
-
-
 <div class="container">
 
   <div class="grid">
@@ -8,23 +6,47 @@
       <!--      <div class="grid__header__item">{{dataSource[0] |}}</div>-->
     </div>
     <div class="grid__body">
-      <div class="grid__body__line" *ngFor="let line of values; trackBy:trackByFn">
-<!--        <div class="grid__body__line__elem">{{line[++i]}}</div>-->
-        <div class="grid__body__line__elem" *ngFor="let item of line; trackBy:trackByFn">
-<!--          <input type="text" value="{{item}}">-->
+      <div class="grid__body__line" *ngFor="let line of values; let q = index; trackBy:trackByFn">
+        <!--        <div class="grid__body__line__elem">{{line[++i]}}</div>-->
+        <div class="grid__body__line__elem" *ngFor="let item of line; let i = index; trackBy:trackByFn">
+          <!--          <input type="text" value="{{item}}">-->
 
-          <form class="example-form">
-            <mat-form-field class="example-full-width">
-              <input matInput value="{{item}}" 
+          <!-- <form class="example-form"> -->
+          <!-- <mat-form-field class="example-full-width"> -->
+          <!-- <input matInput value="{{item}}" 
               name="item"
               [(ngModel)]="values[values.indexOf(line)][line.indexOf(item)]"
               [ngStyle]="{'color': values2[values.indexOf(line)][line.indexOf(item)] ? 'black' : 'red' }"
-              >
-            </mat-form-field>
-          </form>
+              > -->
+          <!-- <mat-label>asdsad {{values[values.indexOf(line)][line.indexOf(item)][0].length > 0}}</mat-label> -->
+          <div class="cell-option">
+            <mat-select [value]="item" (selectionChange)="checkIfAvailables($event, availableValues[q][i][0], q, i)"
+              [(ngModel)]="values[q][i]" [ngStyle]="{'background-color': values2[q][i] ? '' : '#ffcccb' }"
+              *ngIf=" isArray(q, i); else elseBlock">
+
+              <mat-option *ngFor="let val of availableValues[q][i]" [value]="val">
+                {{val}}
+              </mat-option>
+
+              <!-- <mat-option value="option" name="item" >{{item}}</mat-option>
+                <mat-option value="option1" >12321</mat-option>
+                <mat-option value="option2" >1232</mat-option> -->
+            </mat-select>
+          </div>
+
+          <ng-template #elseBlock>
+
+            <div class="cell">
+              <div class="cell-value" [ngStyle]="styleObject(q, i)" (click)="showStyle($event)">
+                {{item}}
+              </div>
+            </div>
+
+          </ng-template>
+
         </div>
       </div>
-<!--      <div class="grid__body__item" *ngFor="let item of items">{{item}}</div>-->
+      <!--      <div class="grid__body__item" *ngFor="let item of items">{{item}}</div>-->
     </div>
   </div>
 
