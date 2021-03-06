@@ -5,10 +5,15 @@
   <div class="tableComponent">
     <div class="table__panel">
 
-      <app-grid [headers]="headers" [values]="values" [values2]="checkedValues"></app-grid>
+      <app-grid [headers]="headers"(validateValuesEvent)="isAllTableValuesValid($event)"  [defaultValues]="defaultValues" [validatedValues]="validatedValues" [availableValues]="availableValues"></app-grid>
 <!--      <app-table-clone [dataSource]="dataSource"></app-table-clone>-->
 
     </div>
+  </div>
+
+  <div class="alarm-links">
+    <div (click)="goToFile('alarmTextFile')" [style.visibility]="linkToAlarmFile ? 'visible' : 'hidden'">alarmTextFile.txt</div>
+    <div (click)="goToFile('siteAlarmTextFile')" [style.visibility]="linkToAlarmFile ? 'visible' : 'hidden'">siteAlarmTextFile.txt</div>
   </div>
 
   <div class="stepper">
@@ -32,7 +37,7 @@
             </div>
 
             <div class="next">
-              <button id="firstStep" mat-stroked-button color="primary" matStepperNext [disabled]="nextVisible">Next</button>
+              <button id="firstStep" mat-stroked-button color="primary" matStepperNext [disabled]="secondStepDisabled">Next</button>
             </div>
           </div>
         </div>

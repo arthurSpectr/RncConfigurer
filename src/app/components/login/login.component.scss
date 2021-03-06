@@ -37,6 +37,12 @@
   width: 100%;
 }
 
+
+// to change autocoplete drop down in mat input
+::ng-deep input.mat-input-element { 
+  width: 200px;
+}
+
 mat-form-field {
   text-align: center;
 }
