@@ -7,6 +7,7 @@ import {LoginGuardService} from './services/security/login-guard.service';
 // import {CompareComponent} from './components/dialogs/compare/compare.component';
 import {StepperComponent} from './components/stepper/stepper.component';
 import {GridComponent} from "./components/grid/grid.component";
+import { FileViewerComponent } from './components/fileviewer/file-viewer.component';
 
 const routerOptions: ExtraOptions = {
   scrollPositionRestoration: 'enabled',
@@ -20,7 +21,8 @@ const routes: Routes = [
   // {path: 'table-download', component: TableDownloadComponent, canActivate: [LoginGuardService]},
   // {path: 'compare', component: CompareComponent, canActivate: [LoginGuardService]},
   {path: 'stepper', component: StepperComponent, canActivate: [LoginGuardService]},
-  {path: 'grid', component: GridComponent}
+  {path: 'grid', component: GridComponent},
+  {path: 'fileViewer', component: FileViewerComponent}
 ];
 
 @NgModule({

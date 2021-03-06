@@ -35,6 +35,8 @@ import { StepperComponent, DialogOverviewExampleDialog } from './components/step
 import { GridComponent } from './components/grid/grid.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {MatSelectModule} from '@angular/material/select';
+import { FileViewerComponent } from './components/fileviewer/file-viewer.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     StepperComponent,
     DialogOverviewExampleDialog,
     // TableCloneComponent,
-    GridComponent
+    GridComponent,
+    FileViewerComponent
   ],
   imports: [
     BrowserModule,
@@ -74,7 +77,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     MatButtonModule,
     MatInputModule,
     MatSnackBarModule,
-    MatGridListModule
+    MatGridListModule,
+    MatSelectModule
   ],
   providers: [
     CookieService,

@@ -1,0 +1,10 @@
+
+
+<div class="alarms-list" *ngFor="let line of alarmFile">
+    <div>{{line}}</div>
+</div>
+
+<div class="download-alarm-file">
+    <button class="back-button" mat-raised-button color="primary" (click)="back()">Back to table</button>
+    <button mat-raised-button color="primary" (click)="downloadFile()">Download Alarms info file</button>
+</div>
