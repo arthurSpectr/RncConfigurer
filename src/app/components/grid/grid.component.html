@@ -6,7 +6,7 @@
       <!--      <div class="grid__header__item">{{dataSource[0] |}}</div>-->
     </div>
     <div class="grid__body">
-      <div class="grid__body__line" *ngFor="let line of values; let q = index; trackBy:trackByFn">
+      <div class="grid__body__line" *ngFor="let line of defaultValues; let q = index; trackBy:trackByFn">
         <!--        <div class="grid__body__line__elem">{{line[++i]}}</div>-->
         <div class="grid__body__line__elem" *ngFor="let item of line; let i = index; trackBy:trackByFn">
           <!--          <input type="text" value="{{item}}">-->
@@ -20,9 +20,10 @@
               > -->
           <!-- <mat-label>asdsad {{values[values.indexOf(line)][line.indexOf(item)][0].length > 0}}</mat-label> -->
           <div class="cell-option">
-            <mat-select [value]="item" (selectionChange)="checkIfAvailables($event, availableValues[q][i][0], q, i)"
-              [(ngModel)]="values[q][i]" [ngStyle]="{'background-color': values2[q][i] ? '' : '#ffcccb' }"
-              *ngIf=" isArray(q, i); else elseBlock">
+            <mat-select [value]="item" (selectionChange)="checkIfCurrentValueAvailable($event, q, i)"
+            [(ngModel)]="defaultValues[q][i]" [ngStyle]="{'background-color': validatedValues[q][i] ? '' : '#ffcccb' }"
+              *ngIf=" isArray(q, i); else elseBlock"
+              >
 
               <mat-option *ngFor="let val of availableValues[q][i]" [value]="val">
                 {{val}}

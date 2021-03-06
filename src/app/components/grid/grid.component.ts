@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter  } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { MatTableDataSource } from "@angular/material/table";
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatSelect } from '@angular/material/select';
@@ -11,83 +11,64 @@ import { MatSelect } from '@angular/material/select';
 })
 export class GridComponent implements OnInit {
 
-  @Output() someEvent = new EventEmitter();
+  @Output() validateValuesEvent = new EventEmitter();
 
   @Input()
   headers = [];
   @Input()
-  values = [];
+  defaultValues = [];
 
   @Input()
-  values2 = [];
+  validatedValues = [];
 
   @Input()
   availableValues = [];
-
-  // headers = [
-  //   'Rehome Order', 'BSC', 'Site', 'Cell', 'LON', 'LAT', 'LAC', 'CI', 'New BSC', 'New LAC', 'New CI', 'New Ura', 'New_RBSID_1', 'New_RBSID_2'
-  // ];
-
-  items = ['14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27'];
-
-  selected = 'option';
 
   constructor() {
   }
 
   ngOnInit(): void {
 
-    this.values2 = [
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-    ]
+    for(let i = 0; i < 12; i++) {
+      let rowArray = [];
+      for(let q = 0; q < 21; q++) {
+        rowArray.push(true);
+      }
+      this.validatedValues.push(rowArray);
+    }
+
+    console.log(this.validatedValues);
   }
 
   trackByFn(index: any, item: any) {
     return index;
   }
 
-  checkIfAvailables(event, number, line, cell) {
+  checkIfCurrentValueAvailable(event, line, cell) {
     let target: MatSelect = event.source;
 
-    let value = event.value;
+    let selectedValue = event.value;
+    let unAvailableValue = this.availableValues[line][cell][0];
 
-    console.log("event value - ", value, "   number - ", number);
+    console.log("selectedValue value - ", selectedValue, "   unAvailableValue - ", unAvailableValue);
+    console.log('is selectedValue != unAvailableValue - ', selectedValue != unAvailableValue)
 
-    if (value != number) {
-      let style1: CSSStyleDeclaration = target._elementRef.nativeElement.style;
-
-      style1.backgroundColor = 'transparent';
-
+    if(selectedValue != unAvailableValue) {
+      let unavailableCellValueStyle: CSSStyleDeclaration = target._elementRef.nativeElement.style;
+      unavailableCellValueStyle.backgroundColor = 'transparent';
+      this.validatedValues[line][cell] = true;
     } else {
-      let style1: CSSStyleDeclaration = target._elementRef.nativeElement.style;
-
-      if (this.values2[line][cell] == false) {
-        style1.backgroundColor = '#ffcccb';
-      }
+      let unavailableCellValueStyle: CSSStyleDeclaration = target._elementRef.nativeElement.style;
+      unavailableCellValueStyle.backgroundColor = '#ffcccb';
+      this.validatedValues[line][cell] = false;
     }
 
-    let allValues = {
-      'values': this.values,
-      'availablaValues': this.availableValues
+    let validatedValues = {
+      'validatedValues': this.validatedValues
     };
 
-    this.someEvent.next(allValues);
-    
-  }
+    this.validateValuesEvent.next(validatedValues);
 
-  showStyle(event) {
-    console.log(event);
   }
 
   isArray(line, cell): boolean {
@@ -104,16 +85,16 @@ export class GridComponent implements OnInit {
 
   styleObject(index1: number, index2: number) {
 
-    if(this.values2.length == 0) return {};
-    if(this.values2[index1] == null) return {};
+    if (this.validatedValues.length == 0) return {};
+    if (this.validatedValues[index1] == null) return {};
 
-    let isValid = this.values2[index1][index2];
-    if(isValid == null) return {};
+    let isValid = this.validatedValues[index1][index2];
+    if (isValid == null) return {};
 
     // console.log("in styleObject - ", isValid, "and  isValid == false && isValid != null - ",  isValid === false && isValid != null);
 
-    if(  isValid === false ) {
-      return {color: 'black', backgroundColor: '#ffcccb'};
+    if (isValid === false) {
+      return { color: 'black', backgroundColor: '#ffcccb' };
     }
 
   }
