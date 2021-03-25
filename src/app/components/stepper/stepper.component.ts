@@ -1,15 +1,14 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileUploader } from 'ng2-file-upload';
-import { MatTableDataSource } from '@angular/material/table';
-import { TableComponent } from '../table/table-main/table.component';
 import { DownloadService } from '../../services/download/download.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ProgressBarMode } from '@angular/material/progress-bar';
-import { forkJoin } from 'rxjs';
 import { GridComponent } from '../grid/grid.component';
 import { Router } from '@angular/router';
 import * as myGlobals from '../../services/globals';
+import { RncModification, RowOfChanges } from 'src/app/model/rnc-modification';
+import { CookieService } from 'ngx-cookie-service';
+import { UploadService } from 'src/app/services/upload/upload.service';
 
 const URL = myGlobals.API + 'v1/rnc/upload';
 
@@ -33,13 +32,7 @@ export class StepperComponent implements OnInit {
   firstFormGroup!: FormGroup;
   secondFormGroup!: FormGroup;
 
-  headers = [];
-  defaultValues = [];
-  availableValues = [];
-  validatedValues = [];
-
-
-  fileOfChanges;
+  rncModification: RncModification = new RncModification();
 
 
   // visibility
@@ -50,7 +43,7 @@ export class StepperComponent implements OnInit {
   public uploader: FileUploader = new FileUploader({ url: URL, itemAlias: 'file' });
 
   // tslint:disable-next-line:variable-name
-  constructor(private _formBuilder: FormBuilder, public service: DownloadService, public dialog: MatDialog, private router: Router) { }
+  constructor(private _formBuilder: FormBuilder, public service: DownloadService, public uploadService: UploadService, public dialog: MatDialog, private router: Router, private cookieService: CookieService) { }
 
   ngOnInit() {
     this.firstFormGroup = this._formBuilder.group({
@@ -60,14 +53,23 @@ export class StepperComponent implements OnInit {
       secondCtrl: ['', Validators.required]
     });
 
-    this.service.reCreateFileOfChanges().subscribe(data => {
+    this.service.reCreateFileOfChanges().subscribe(response => {
 
-      if (data && data.headers && data.headers.length > 0) {
-        this.fileOfChanges = data;
+
+      let data = response.body;
+
+      console.log(data)
+
+      if (data != null && data.headers && data.headers.length > 0) {
+
+
+
 
         this.validateVisible = false;
-        this.headers = data.headers;
-        this.defaultValues = data.values;
+        console.log("trying to recreate file of changes - ", data.values)
+
+        this.rncModification = data;
+        console.log("rncmodification - ", this.rncModification);
 
         let tablePanel = document.querySelector(".table__panel");
         if (tablePanel) {
@@ -79,57 +81,33 @@ export class StepperComponent implements OnInit {
           tableComponent.setAttribute("style", "display:block");
         }
 
-        forkJoin(
-          this.service.reCreateAvailableFileOfChanges(),
-          this.service.reCreateValidatedFileOfChanges()
 
-        ).subscribe(([availableValues, validatedValues]) => {
-          console.log("recreate validated file of changes — ", availableValues);
-          console.log("recreate available file of changes — ", validatedValues);
+        this.service.reCreateValidatedFileOfChanges().subscribe(rncModif => {
 
-          if (availableValues.headers.length > 0) {
-            this.availableValues = availableValues['values'];
+
+          if (rncModif != null && rncModif.body != null) {
+
+            if (rncModif.body.headers.length > 0) {
+
+              this.rncModification = rncModif.body;
+
+              this.linkToAlarmFile = true;
+
+
+              this.secondStepDisabled = !this.isValid(this.rncModification.values);
+              console.log("from recreate file of changes, isValid - ", this.secondStepDisabled);
+              console.log('in recreate file secondStepDisabled = ', this.secondStepDisabled);
+            }
           }
 
-          if (validatedValues.headers.length > 0) {
-            this.validatedValues = validatedValues['values'];
-          }
 
-          if (availableValues.headers.length > 0 && validatedValues.headers.length > 0) {
-            this.linkToAlarmFile = true;
-
-
-            this.secondStepDisabled = !this.isValid(this.validatedValues);
-            console.log('in recreate file secondStepDisabled = ', this.secondStepDisabled);
-          }
         }, error => {
           console.log(error);
-        });
+        })
+
       }
     })
 
-
-
-    // this.service.reCreateFileOfChanges().subscribe(data => {
-
-    //   if (data.headers.length > 0) {
-    //     console.log("if headers  > 0  ", data);
-
-    //     this.validateVisible = false;
-    //     this.headers = data.headers;
-    //     this.values = data.values;
-
-    //     let tablePanel = document.querySelector(".table__panel");
-    //     if (tablePanel) {
-    //       tablePanel.setAttribute("style", "display:block");
-    //     }
-
-    //     let tableComponent = document.querySelector(".tableComponent");
-    //     if (tableComponent) {
-    //       tableComponent.setAttribute("style", "display:block");
-    //     }
-    //   }
-    // })
 
     // this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; this.isDivVisible = true; };
     // this.uploader.onErrorItem = (item: any, response: any, status: any, headers: any) => {
@@ -138,64 +116,71 @@ export class StepperComponent implements OnInit {
 
     let dialogRef;
 
-    this.uploader.onBeforeUploadItem = (file) => {
-      this.lastFileName = this.filename;
-      this.filename = file._file.name;
 
-      dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-        width: '150px',
-        height: '150px',
-        disableClose: true
-      });
-    };
-    this.uploader.onAfterAddingFile = (file) => {
-      file.withCredentials = false;
-    };
-    this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
 
-      if (JSON.parse(response).status) {
+  }
 
-        let isFinished = false;
-        this.service.getFileOfChanges(this.filename).subscribe(data => {
+  uploadFile(event) {
 
-          console.log(data);
+    let dialogRef;
 
-          if (data && data.headers) {
-            this.fileOfChanges = data;
+    dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+      width: '150px',
+      height: '150px',
+      disableClose: true
+    });
 
-            isFinished = true;
 
-            this.validateVisible = false;
-            this.headers = data.headers;
-            this.defaultValues = data.values;
-            this.availableValues = [];
-            this.validatedValues = [];
+    let fileList: FileList = event.target.files;
 
-            let tablePanel = document.querySelector(".table__panel");
-            if (tablePanel) {
-              tablePanel.setAttribute("style", "display:block");
-            }
+    if (fileList.length > 0) {
+      let file: File = fileList[0];
 
-            let tableComponent = document.querySelector(".tableComponent");
-            if (tableComponent) {
-              tableComponent.setAttribute("style", "display:block");
-            }
+      console.log('in upload file, file - ', file);
 
-            dialogRef.close();
-          } else {
-            dialogRef.close();
-            console.log("getting error list from server   ", data)
 
-            alert(data.response)
-            return;
+
+      let formData: FormData = new FormData();
+      formData.append('file', file, file.name);
+
+      this.uploadService.upload(formData).subscribe(response => {
+
+        // console.log('from upload, response - ', response)
+
+        dialogRef.close();
+
+        let rncModif = response.body;
+
+        if (rncModif.headers.length > 0) {
+
+          this.rncModification = rncModif;
+          // console.log("rncmodification - ", this.rncModification);
+
+
+          this.validateVisible = false;
+
+          let tablePanel = document.querySelector(".table__panel");
+          if (tablePanel) {
+            tablePanel.setAttribute("style", "display:block");
           }
 
-        }, err => { console.log(err); dialogRef.close(); });
-      } else {
-        alert('validation was not passed, choose another file');
-      }
+          let tableComponent = document.querySelector(".tableComponent");
+          if (tableComponent) {
+            tableComponent.setAttribute("style", "display:block");
+          }
 
-    };
+
+        } else {
+          dialogRef.close();
+          console.log("getting error list from server   ")
+
+          alert(rncModif)
+          return;
+        }
+      });
+
+
+    }
   }
 
   browse() {
@@ -210,10 +195,21 @@ export class StepperComponent implements OnInit {
   }
 
   downloadFiles() {
+    console.log("in download files method")
+
+    const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+      width: '150px',
+      height: '150px',
+      disableClose: true
+    });
 
     return this.service.getFiles().subscribe(data => {
+
+      dialogRef.close();
+
       this.saveFile(data.body, data.headers.get('content-disposition'));
     }, error => {
+      dialogRef.close();
       console.log('Error during download file');
       console.log(error);
     }), () => console.log('OK');
@@ -238,28 +234,60 @@ export class StepperComponent implements OnInit {
       disableClose: true
     });
 
-    this.validatedValues = this.fileOfChanges.values;
+    // this.validatedValues = this.fileOfChanges.values;
 
-    forkJoin(
-      this.service.validateRnc(this.fileOfChanges),
-      this.service.checkAvailableparams(this.fileOfChanges)
-    ).subscribe(([res1, res2]) => {
-      console.log("validatedValues — ", res1);
-      console.log("availableValues — ", res2);
-
+    this.service.validateRnc(this.rncModification).subscribe(data => {
 
       this.linkToAlarmFile = true;
-      this.validatedValues = res1['values'];
-      this.availableValues = res2['values'];
+      // this.validatedValues = res1.values;
+      // this.availableValues = res2.values;
 
-      this.secondStepDisabled = !this.isValid(this.validatedValues);
+      // this.fileOfChanges = validatedValues;
+
+      // this.defaultValues = validatedValues['values'];
+
+
+      let rncModif = data.body;
+      this.rncModification = rncModif;
+
+      console.log("headers from validate - ", this.rncModification.headers)
+
+      this.secondStepDisabled = !this.isValid(this.rncModification.values);
+      console.log("from validateRnc, isValid - ", this.secondStepDisabled);
 
       dialogRef.close();
-      console.log("all requests are completed")
+
+
     }, error => {
       dialogRef.close();
-      console.log(error);
+      console.log(error)
     });
+
+
+    // forkJoin(
+    //   this.service.validateRnc(this.fileOfChanges),
+    //   this.service.checkAvailableparams(this.fileOfChanges)
+    // ).subscribe(([validatedValues, availableValues]) => {
+    //   console.log("validatedValues — ", validatedValues);
+    //   console.log("availableValues — ", availableValues);
+
+
+    //   this.linkToAlarmFile = true;
+    //   // this.validatedValues = res1.values;
+    //   // this.availableValues = res2.values;
+
+    //   this.fileOfChanges = validatedValues;
+    //   this.defaultValues = validatedValues['values'];
+
+
+    //   this.secondStepDisabled = !this.isValid(this.defaultValues);
+
+    //   dialogRef.close();
+    //   console.log("all requests are completed")
+    // }, error => {
+    //   dialogRef.close();
+    //   console.log(error);
+    // });
 
   }
 
@@ -274,23 +302,41 @@ export class StepperComponent implements OnInit {
   //     a.every((val, index) => val.every((val1, index1) => val1 === b[index][index1]) );
   // }
 
-  isValid(validatedValues): boolean {
-    console.log('validated values in method isValid - ', validatedValues)
+  isValid(rows: Array<RowOfChanges>): boolean {
+
+    console.log("from isValid, rows - ", rows);
 
     let result = true;
 
-    if (validatedValues instanceof Array) {
+    if (rows instanceof Array) {
 
-      validatedValues.forEach(row => {
-        row.forEach(cell => {
-          
-          if (cell === false) {
-            console.log("when cell is false in isValid method");
+      rows.forEach(row => {
+        row.cells.forEach(cell => {
+
+          if (cell.valid === false) {
             result = false;
           }
         });
       });
-    } 
+
+      // for(let i = 0; i< rows.length; i++) {
+
+      //   let rowCells = rows[i].cells;
+
+      //   for(let q = 0; q < rowCells.length; q++) {
+
+      //     let cell = rowCells[q].isValid;
+
+      //     console.log("from isValid cell.isValid - ", rowCells[q])
+      //     if(cell === false) {
+      //       return false;
+      //     }
+
+      //   }
+
+      // }
+
+    }
 
     return result;
   }
@@ -374,7 +420,7 @@ export class StepperComponent implements OnInit {
   isAllTableValuesValid(validateValuesEvent) {
     console.log(validateValuesEvent)
     this.secondStepDisabled = !this.isValid(validateValuesEvent.validatedValues);
-    console.log("in isAllTableValuesValid - disabled = ", this.secondStepDisabled)
+    console.log("from isAllTableValuesValid, isValid - ", this.secondStepDisabled);
   }
 
 }

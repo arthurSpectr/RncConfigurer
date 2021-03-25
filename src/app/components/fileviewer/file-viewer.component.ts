@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DownloadService } from '../../services/download/download.service';
 import {Router, ActivatedRoute} from '@angular/router';
+import { RncModification } from 'src/app/model/rnc-modification';
 
 @Component({
   selector: 'app-file-viewer',
@@ -23,7 +24,8 @@ export class FileViewerComponent implements OnInit {
     })
 
     this.service.getAlarmFile(this.fileName).subscribe(data => {
-      this.alarmFile = data as Array<any>;
+      this.alarmFile = data.body as Array<any>;
+      console.log('response of get alarm file - ', data.body);
 
 
       console.log("FileViewerComponent after getAlarmFile request  ", data)
@@ -31,7 +33,7 @@ export class FileViewerComponent implements OnInit {
   }
 
   downloadFile() {
-    this.service.downloadAlarmFile(this.fileName).subscribe(data => {
+    this.service.getFile(this.fileName).subscribe(data => {
       this.saveFile(data.body, data.headers.get('content-disposition'));
     }, error => {
       console.log('Error during download file');

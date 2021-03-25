@@ -13,7 +13,7 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private router: Router, private loginService: LoginService, private httpClient: HttpClient) { }
+  constructor(private router: Router, private loginService: LoginService, private httpClient: HttpClient, private cookieService: CookieService) { }
   username: string = '';
   password: string = '';
   showSpinner = false;
@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
 
     this.loginService.authenticate(this.username, this.password).subscribe(data => {
       sessionStorage.setItem('username', this.username);
+
 
       // this.loginService.getToken().subscribe(data => {
       //   sessionStorage.setItem("Token", data['token']);

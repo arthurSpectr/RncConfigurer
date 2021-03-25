@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
-import {delay, map} from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
 import * as myGlobals from '../../services/globals';
 
 @Injectable({
@@ -12,22 +12,19 @@ export class DownloadService {
 
   public API = myGlobals.API + 'v1/rnc/';
 
-  headers = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      JSESSIONID: this.cookieService.get('JSESSIONID')
-    })
-  };
+  headers: HttpHeaders  = new HttpHeaders({
+    'Access-Control-Expose-Headers': 'Custom-Header, X-Auth-Token, Content-Type'
+  });
 
   constructor(private http: HttpClient, private cookieService: CookieService) {
   }
 
-  getFile(): Observable<any> {
-    return this.http.get(this.API + 'downloadFile/RncMaximoTableSample.csv', {responseType: 'blob' as 'json', observe: 'response'});
+  getFile(fileName: string): Observable<any> {
+    return this.http.get(this.API + 'download/' + fileName, { headers: this.headers, responseType: 'blob' as 'json', observe: 'response' });
   }
 
   getFiles(): Observable<any> {
-    return this.http.get(this.API + 'download/files', {responseType: 'blob', observe: 'response'});
+    return this.http.get(this.API + 'download/files', { responseType: 'blob', observe: 'response' });
   }
 
   getTable(filename: string): Observable<any> {
@@ -39,27 +36,28 @@ export class DownloadService {
   }
 
   getFileOfChanges(filename: string): Observable<any> {
-    return this.http.get(this.API + "get-file-of-changes/" + filename);
+    return this.http.get(this.API + "get-file-of-changes/" + filename, {headers: this.headers, observe: 'response'});
   }
 
   reCreateFileOfChanges(): Observable<any> {
-    return this.http.get(this.API + "recreate-file-of-changes/");
+
+    return this.http.get(this.API + "recreate-file-of-changes/", {headers: this.headers, observe: 'response'});
   }
 
   reCreateValidatedFileOfChanges(): Observable<any> {
-    return this.http.get(this.API + "recreate-validated-file-of-changes/");
+    return this.http.get(this.API + "recreate-validated-file-of-changes/", {headers: this.headers, observe: 'response'});
   }
 
   reCreateAvailableFileOfChanges(): Observable<any> {
-    return this.http.get(this.API + "recreate-available-file-of-changes/");
+    return this.http.get(this.API + "recreate-available-file-of-changes/", {headers: this.headers, observe: 'response'});
   }
 
   validateRnc(file: any): Observable<any> {
-    return this.http.post(this.API + "validate-file-of-changes", file);
+    return this.http.post(this.API + "validate-file-of-changes", file, {headers: this.headers, observe: 'response'});
   }
 
   checkAvailableparams(file: any): Observable<any> {
-    return this.http.post(this.API + "check-available-params", file);
+    return this.http.post(this.API + "check-available-params", file, {headers: this.headers, observe: 'response'});
   }
 
   inputChanges(fileOfChanges: string): Promise<object> {
@@ -67,10 +65,10 @@ export class DownloadService {
   }
 
   getAlarmFile(file: string) {
-    return this.http.get(this.API + 'get-alarm-file/' + file);
+    return this.http.get(this.API + 'get-alarm-file/' + file, {headers: this.headers, observe: 'response'});
   }
 
   downloadAlarmFile(fileName): Observable<any> {
-    return this.http.get(this.API + 'download-alarm-file/' + fileName, {responseType: 'blob', observe: 'response'});
+    return this.http.get(this.API + 'download-alarm-file/' + fileName, { headers: this.headers, responseType: 'blob', observe: 'response' });
   }
 }

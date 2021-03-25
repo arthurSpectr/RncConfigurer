@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {map} from 'rxjs/operators';
-import {Observable} from 'rxjs';
-import {Router} from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import {error} from "@angular/compiler/src/util";
+import { error } from "@angular/compiler/src/util";
 import * as myGlobals from '../globals';
 
 @Injectable({
@@ -16,28 +16,25 @@ export class LoginService {
 
   form: FormData = new FormData();
 
-  headers = new HttpHeaders();
+  headers = new HttpHeaders({'Access-Control-Expose-Headers': 'Custom-Header, X-Auth-Token, Content-Type'});
 
   authenticate(username: string, password: string | Blob) {
+    this.cookieService.deleteAll();
+    sessionStorage.clear();
+
+
     this.form.delete('username');
     this.form.delete('password');
     this.form.append('username', username);
     this.form.append('password', password);
 
-    this.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+    // this.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+    this.headers.set('Content-Type', 'multipart/form-data');
     // this.headers.append('Cookie', this.cookieService.get('JSESSIONID'));
     // this.headers.append("Authorization", 'Basic ' + btoa(username + ':' + password));
 
-    return this.httpClient.post(myGlobals.API + 'login', this.form, {withCredentials: true, headers: this.headers}).pipe(
-      map(
-        userData => {
-          sessionStorage.setItem('username', username);
-          // let tokenStr = 'Bearer '+userData['token'];
-          // sessionStorage.setItem('token', tokenStr);
-          return userData;
-        }
-      )
-    );
+    // return this.httpClient.post(myGlobals.API_LOGIN + 'login/user', this.form, { headers:  new HttpHeaders({'X-Auth-Token': ''}), withCredentials: true, observe: 'response' });
+    return this.httpClient.post(myGlobals.API + 'login', this.form, {headers: this.headers, observe: 'response'});
   }
 
   getToken() {
@@ -50,14 +47,31 @@ export class LoginService {
   }
 
   logOut() {
-   this.httpClient.post(myGlobals.API + 'logout', '').subscribe(data => {
-      console.log('succesfully logout');
-      sessionStorage.clear();
-      this.router.navigate(['login']);
+    console.log('in logout request X-Auth-Token - ', this.cookieService.get('X-Auth-Token'));
+
+
+    this.httpClient.post(myGlobals.API_LOGIN + 'full/logout', {headers: this.headers}).subscribe(data => {
+      console.log("during logout  ", data);
+
+
+      this.httpClient.post(myGlobals.API + 'logout', {headers: this.headers, observe: 'response'}).subscribe(data => {
+        this.cookieService.deleteAll();
+        console.log('succesfully logout');
+        sessionStorage.clear();
+        this.router.navigate(['login']);
+      }, error => {
+        this.cookieService.deleteAll();
+        sessionStorage.clear();
+        console.log('logout error');
+        console.log(error);
+        this.router.navigate(['login']);
+      });
+
     }, error => {
-     console.log('logout error');
-     console.log(error);
-   });
+      console.log('error during logout');
+    });
+
+    
 
   }
 

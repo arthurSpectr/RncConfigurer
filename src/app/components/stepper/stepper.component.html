@@ -5,7 +5,8 @@
   <div class="tableComponent">
     <div class="table__panel">
 
-      <app-grid [headers]="headers"(validateValuesEvent)="isAllTableValuesValid($event)"  [defaultValues]="defaultValues" [validatedValues]="validatedValues" [availableValues]="availableValues"></app-grid>
+      <!-- <app-grid [headers]="headers"(validateValuesEvent)="isAllTableValuesValid($event)"  [defaultValues]="defaultValues"></app-grid> -->
+      <app-grid (validateValuesEvent)="isAllTableValuesValid($event)"  [rncModification]="rncModification"></app-grid>
 <!--      <app-table-clone [dataSource]="dataSource"></app-table-clone>-->
 
     </div>
@@ -21,8 +22,8 @@
       <mat-step [stepControl]="firstFormGroup">
 
         <ng-template matStepLabel>Upload file of changes</ng-template>
-        <input type="file" name="photo" id="selectedFile" ng2FileSelect [uploader]="uploader"
-               (change)="uploader.uploadAll()" style="display: none;"/>
+        <input type="file" name="photo" id="selectedFile"
+               (change)="uploadFile($event)" style="display: none;" accept=".csv, .xlsx"/>
 
         <div class="controls">
           <div class="controls__inner">
@@ -48,15 +49,26 @@
         <ng-template matStepLabel>Download creation commands from terminal</ng-template>
         <div class="controls">
           <div class="controls__inner">
-            <div class="controls__btns">
+            <div class="controls__btns__second">
 
-              <mat-form-field class="controls__btns__search">
+              <!-- <mat-form-field class="controls__btns__search">
                 <input matInput placeholder="Search Some">
-              </mat-form-field>
+              </mat-form-field> -->
 
-<!--              <button class="controls__btns__general" mat-raised-button (click)="browse()">Import file</button>-->
-              <button class="controls__btns__general" (click)="downloadFiles()" mat-raised-button>download creation commands from terminal</button>
-              <button mat-raised-button>Prepare final file</button>
+              <!-- <div class="btn-controls"> -->
+                <button class="box" color="primary" (click)="downloadFiles()" mat-raised-button>IUB Utran Cell</button>
+                <button class="box" color="primary" mat-raised-button>Deactivation</button>
+                <button class="box" color="primary" mat-raised-button>MSS Update</button>
+                <button class="box" color="primary" mat-raised-button>Activation</button>
+                <button class="box" color="primary" mat-raised-button>Neighbours</button>
+                <button class="box" color="primary" mat-raised-button>Delete nodes</button>
+                <button class="box" color="primary" mat-raised-button>External Neighbours</button>
+                <button class="box" color="primary" mat-raised-button>NTP Update</button>
+                <button class="box" color="primary" mat-raised-button>CNA Update</button>
+                <button class="box" color="primary" mat-raised-button>Validate Rehome</button>
+                <button class="box a" color="primary" mat-raised-button>Undo Rehome</button>
+              <!-- </div> -->
+              
             </div>
 
             <div class="controls__btns__navigation">

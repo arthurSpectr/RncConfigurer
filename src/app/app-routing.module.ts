@@ -1,12 +1,9 @@
 import { NgModule } from '@angular/core';
-import {Routes, RouterModule, ExtraOptions} from '@angular/router';
-import { AppComponent } from './app.component';
-import { TableComponent } from './components/table/table-main/table.component';
-import {LoginComponent} from './components/login/login.component';
-import {LoginGuardService} from './services/security/login-guard.service';
-// import {CompareComponent} from './components/dialogs/compare/compare.component';
-import {StepperComponent} from './components/stepper/stepper.component';
-import {GridComponent} from "./components/grid/grid.component";
+import { Routes, RouterModule, ExtraOptions } from '@angular/router';
+import { LoginComponent } from './components/login/login.component';
+import { LoginGuardService } from './services/security/login-guard.service';
+import { StepperComponent } from './components/stepper/stepper.component';
+import { GridComponent } from "./components/grid/grid.component";
 import { FileViewerComponent } from './components/fileviewer/file-viewer.component';
 
 const routerOptions: ExtraOptions = {
@@ -15,14 +12,10 @@ const routerOptions: ExtraOptions = {
   scrollOffset: [0, 64],
 };
 const routes: Routes = [
-  {path: 'table', component: TableComponent, canActivate: [LoginGuardService]},
   {path: 'login', component: LoginComponent},
-  // {path: 'table-warning', component: TableWarningComponent, canActivate: [LoginGuardService]},
-  // {path: 'table-download', component: TableDownloadComponent, canActivate: [LoginGuardService]},
-  // {path: 'compare', component: CompareComponent, canActivate: [LoginGuardService]},
   {path: 'stepper', component: StepperComponent, canActivate: [LoginGuardService]},
-  {path: 'grid', component: GridComponent},
-  {path: 'fileViewer', component: FileViewerComponent}
+  {path: 'grid', component: GridComponent, canActivate: [LoginGuardService]},
+  {path: 'fileViewer', component: FileViewerComponent, canActivate: [LoginGuardService]}
 ];
 
 @NgModule({
