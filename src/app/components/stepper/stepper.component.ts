@@ -194,8 +194,8 @@ export class StepperComponent implements OnInit {
     this.uploader.clearQueue();
   }
 
-  downloadFiles() {
-    console.log("in download files method")
+  performIubUtranCell() {
+    console.log("in performIubUtranCell method")
 
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
       width: '150px',
@@ -203,11 +203,31 @@ export class StepperComponent implements OnInit {
       disableClose: true
     });
 
-    return this.service.getFiles().subscribe(data => {
+    return this.service.performIubUtranCell().subscribe(data => {
 
       dialogRef.close();
 
       this.saveFile(data.body, data.headers.get('content-disposition'));
+    }, error => {
+      dialogRef.close();
+      console.log('Error during download file');
+      console.log(error);
+    }), () => console.log('OK');
+  }
+
+  performExternalNeighbours() {
+    console.log("in performExternalNeighbours method")
+
+    const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+      width: '150px',
+      height: '150px',
+      disableClose: true
+    });
+
+    return this.service.performExternalNeighbours().subscribe(data => {
+
+      dialogRef.close();
+
     }, error => {
       dialogRef.close();
       console.log('Error during download file');

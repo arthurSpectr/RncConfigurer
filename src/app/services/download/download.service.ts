@@ -23,8 +23,12 @@ export class DownloadService {
     return this.http.get(this.API + 'download/' + fileName, { headers: this.headers, responseType: 'blob' as 'json', observe: 'response' });
   }
 
-  getFiles(): Observable<any> {
-    return this.http.get(this.API + 'download/files', { responseType: 'blob', observe: 'response' });
+  performIubUtranCell(): Observable<any> {
+    return this.http.get(this.API + 'perform/iub-utran-cell', { responseType: 'blob', observe: 'response' });
+  }
+
+  performExternalNeighbours(): Observable<any> {
+    return this.http.get(this.API + 'perform/external-neighbours', { responseType: 'blob', observe: 'response' });
   }
 
   getTable(filename: string): Observable<any> {

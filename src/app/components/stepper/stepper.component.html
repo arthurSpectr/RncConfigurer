@@ -56,13 +56,13 @@
               </mat-form-field> -->
 
               <!-- <div class="btn-controls"> -->
-                <button class="box" color="primary" (click)="downloadFiles()" mat-raised-button>IUB Utran Cell</button>
+                <button class="box" color="primary" (click)="performIubUtranCell()" mat-raised-button>IUB Utran Cell</button>
                 <button class="box" color="primary" mat-raised-button>Deactivation</button>
                 <button class="box" color="primary" mat-raised-button>MSS Update</button>
                 <button class="box" color="primary" mat-raised-button>Activation</button>
                 <button class="box" color="primary" mat-raised-button>Neighbours</button>
                 <button class="box" color="primary" mat-raised-button>Delete nodes</button>
-                <button class="box" color="primary" mat-raised-button>External Neighbours</button>
+                <button class="box" color="primary" (click)="performExternalNeighbours()" mat-raised-button>External Neighbours</button>
                 <button class="box" color="primary" mat-raised-button>NTP Update</button>
                 <button class="box" color="primary" mat-raised-button>CNA Update</button>
                 <button class="box" color="primary" mat-raised-button>Validate Rehome</button>
